@@ -29,17 +29,17 @@ and parameter set.
 ## Parameter Dump
 68 Bytes, TX->PC
 * Byte [0,1]: Header, always [0x55, 0xFD]
-* Byte [2-65]: payload, see Parameter section.
-* Byte [66,67]: Checksum. All bytes of payload added up, MSB first.
+* Byte [2-66]: payload, see Parameter section.
+* Byte [67,68]: Checksum. All bytes of payload added up, MSB first.
 
 ## Parameter Set
 68 Bytes, PC->TX
 * Byte [0,1]: Header. Always [0x55, 0xFF]
-* Byte [2-65]: payload. See Parameter section.
-* Byte [66,67]: Checksum. All bytes of payload added up, MSB first.
+* Byte [2-66]: payload. See Parameter section.
+* Byte [67,68]: Checksum. All bytes of payload added up, MSB first.
 
 ## Parameters
-64 Bytes, payload
+65 Bytes, payload
 * Byte [0] upper nibble: TX Model.
   * Resp. Model1-4
 * Byte [0] lower nibble: Craft Type.
