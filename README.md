@@ -8,36 +8,35 @@ The serial port of the transmitter is set at 115200 baud. I've seen 4
 messages so far. Pot-state message, parameter request, parameter dump,
 and parameter set.
 
-0x55 Sync message?
-
 ## Pot-state message
-17 Bytes, TX->PC
-* Byte [0]: Header, always [0xFC]
-* Byte [1-14]: Payload, Potmeter values.
-  * [1] MSB [2] LSB CH1
-  * [3] MSB [4] LSB CH2
-  * [5] MSB [6] LSB CH3
-  * [7] MSB [8] LSB CH4
-  * [9] MSB [10] LSB CH5
-  * [11] MSB [12] LSB CH6
-  * [13] MSB [14] __LSB CH4 but between 0 and 1000?__
-* Byte [15,16]: Checksum. All bytes of payload added up, MSB first.
+18 Bytes, TX->PC
+* Byte [0,1]: Header, always [0x55, 0xFC]
+* Byte [2-15]: Payload, Potmeter values.
+  * [2] MSB [3] LSB CH1
+  * [4] MSB [5] LSB CH2
+  * [6] MSB [7] LSB CH3
+  * [8] MSB [9] LSB CH4
+  * [10] MSB [11] LSB CH5
+  * [12] MSB [13] LSB CH6
+  * [14] MSB [15] __LSB CH4 but between 0 and 1000?__
+* Byte [16,17]: Checksum. All bytes of payload added up, MSB first.
 
 ## Parameter Request
-2 Bytes, PC->TX
-* Byte [0,1]: Header, always [0x0, 0xFA] **(NOTE: 0x0 as footer is more likely? CHECKME)**
+3 Bytes, PC->TX
+* Byte [0,1]: Header, always [0x55, 0xFA]
+* Byte [2]: UNKNOWN, always [0x00]
 
 ## Parameter Dump
-67 Bytes, TX->PC
-* Byte [0]: Header, always [0xFD]
-* Byte [1-64]: payload, see Parameter section.
-* Byte [65,66]: Checksum. All bytes of payload added up, MSB first.
+68 Bytes, TX->PC
+* Byte [0,1]: Header, always [0x55, 0xFD]
+* Byte [2-65]: payload, see Parameter section.
+* Byte [66,67]: Checksum. All bytes of payload added up, MSB first.
 
 ## Parameter Set
-67 Bytes, PC->TX
-* Byte [0]: Header. Always [0xFF]
-* Byte [1-64]: payload. See Parameter section.
-* Byte [65,66]: Checksum. All bytes of payload added up, MSB first.
+68 Bytes, PC->TX
+* Byte [0,1]: Header. Always [0x55, 0xFF]
+* Byte [2-65]: payload. See Parameter section.
+* Byte [66,67]: Checksum. All bytes of payload added up, MSB first.
 
 ## Parameters
 64 Bytes, payload
