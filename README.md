@@ -20,7 +20,7 @@ and parameter set.
   * [7] MSB [8] LSB CH4
   * [9] MSB [10] LSB CH5
   * [11] MSB [12] LSB CH6
-  * [13] MSB [14] LSB CH7
+  * [13] MSB [14] __LSB CH4 but between 0 and 1000?__
 * Byte [15,16]: Checksum. All bytes of payload added up, MSB first.
 
 ## Parameter Request
