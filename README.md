@@ -8,18 +8,20 @@ The serial port of the transmitter is set at 115200 baud. I've seen 4
 messages so far. Pot-state message, parameter request, parameter dump,
 and parameter set.
 
+0x55 Sync message?
+
 ## Pot-state message
-18 Bytes, TX->PC
-* Byte [0,1]: Header, always [0x55, 0xFC] **(NOTE: 0x55 as footer is more likely? CHECKME)**
-* Byte [2-17]: Potmeter values.
-  * [2] MSB [3] LSB CH1
-  * [4] MSB [5] LSB CH2
-  * [6] MSB [7] LSB CH3
-  * [8] MSB [9] LSB CH4
-  * [10] MSB [11] LSB CH5
-  * [12] MSB [13] LSB CH6
-  * [14] MSB [15] LSB CH7
-  * [16] MSB [17] LSB CH8
+17 Bytes, TX->PC
+* Byte [0]: Header, always [0xFC]
+* Byte [1-14]: Payload, Potmeter values.
+  * [1] MSB [2] LSB CH1
+  * [3] MSB [4] LSB CH2
+  * [5] MSB [6] LSB CH3
+  * [7] MSB [8] LSB CH4
+  * [9] MSB [10] LSB CH5
+  * [11] MSB [12] LSB CH6
+  * [13] MSB [14] LSB CH7
+* Byte [15,16]: Checksum. All bytes of payload added up, MSB first.
 
 ## Parameter Request
 2 Bytes, PC->TX
