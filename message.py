@@ -10,11 +10,21 @@ MSGMAP = {OPC_PARAM_REQUEST:2, OPC_POT:17, OPC_PARAM_DUMP:68,
 	OPC_PARAM_LOAD:68} #length excl MSGSTART, incl checksum
 
 def request_param_msg():
-	return map(chr, [MSGSTART, OPC_PARAM_DUMP, 0])
+	return map(chr, [OPC_PARAM_REQUEST, 0])
 
 def load_param_msg(payload):
 	s = sum(payload)
-	return map(chr, [MSGSTART, OPC_PARAM_LOAD] + payload + [s>>8, s&0xFF])
+	return map(chr, [OPC_PARAM_LOAD] + payload + [s>>8, s&0xFF])
+
+def dump_param_msg(payload):
+	s = sum(payload)
+	return map(chr, [OPC_PARAM_DUMP] + payload + [s>>8, s&0xFF])
+
+def pot_msg(c1,c2,c3,c4,c5,c6):
+	payload = endbig(c1) + endbig(c2) + endbig(c3) + endbig(c4) +\
+		endbig(c5) + endbig(c6) + endbig(0)
+	s = sum(payload)
+	return map(chr, [OPC_POT] + payload + [s>>8, s&0xFF])
 
 def checksum(msg):
 	if msg[0] not in MSGCHK:
@@ -27,6 +37,9 @@ def checksum(msg):
 def bigend(v):
 	assert len(v) == 2
 	return (v[0]<<8)|v[1]
+
+def endbig(v):
+	return [v>>8, v&0xFF]
 
 def twos(v):
 	if v>>7:
@@ -145,7 +158,8 @@ def parse_param(msg):
 
 def parse(msg):
 	assert msg
-	assert len(msg) > 0 and msg[0] in MSGMAP
+	assert len(msg) > 0
+	assert msg[0] in MSGMAP
 	assert len(msg) == MSGMAP[msg[0]]
 
 	parser = {

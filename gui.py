@@ -43,9 +43,9 @@ def draw_param(win, offy, offx, p):
 			curses.color_pair(0))
 
 def draw_legenda(win, offy, offx):
-	win.addstr(offy+0, offx, "d: download configuration",
+	win.addstr(offy+0, offx, "d: download configuration to PC",
 		curses.color_pair(3)|curses.A_BOLD)
-	win.addstr(offy+1, offx, "u: upload configuration",
+	win.addstr(offy+1, offx, "u: upload configuration to TX",
 		curses.color_pair(3)|curses.A_BOLD)
 	win.addstr(offy+2, offx, "q: quit",
 		curses.color_pair(3)|curses.A_BOLD)
