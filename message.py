@@ -78,7 +78,7 @@ proc = {UINT16:(uint16, uint16_store), UINT8:(uint8, uint8_store),
 
 
 class Data:
-	def __init__(self, opc, parser, offset, drange_raw, drange_show, label, pos):
+	def __init__(self, opc, parser, offset, drange_raw, drange_show, label, pos=None):
 		self.opc = opc
 		self.parser = parser
 		self.offset = offset
@@ -114,7 +114,6 @@ class Data:
 		i = self.drange_raw.index(raw)
 		if i == len(self.drange_raw)-1: return
 		self.write(msg, self.drange_raw[i+1])
-
 
 	def get(self, msg):
 		"""Return current value in presentation format"""
