@@ -102,6 +102,8 @@ def gui(stdscr, inqueue, outqueue):
 					d.changed = False
 			elif c == ord('u') and last_param_msg:
 				outqueue.put(load_param_msg(last_param_msg[1:-2]))
+				for d in datas:
+					d.changed = False
 			elif c == ord('a') and last_param_msg:
 				autotrim(last_param_msg, last_pot_msg, trims, channels)
 			elif c == curses.KEY_DOWN:
