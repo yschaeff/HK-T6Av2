@@ -17,19 +17,20 @@ def draw_pot(win, offy, offx, msg, channels):
 		markr = remap(900, 2100, l, w, 2000)
 		markv = remap(900, 2100, l, w, channel.read(msg))
 		#we expect value between 1000 and 2000
+		c = " "
 		for x in range(l, w):
-			if x in [markl, markc, markr]:
+			if x in [markl, markc, markr]: #markers
 				if x == markv:
-					c = "I"
+					style = curses.color_pair(3)|curses.A_BOLD
 				else:
-					c = " "
-				win.addstr(channel.pos[0]+offy, x, c, curses.color_pair(1)|curses.A_BOLD)
+					style = curses.color_pair(1)|curses.A_BOLD
+				win.addstr(channel.pos[0]+offy, x, c, style)
 			else:
 				if x == markv:
-					c = "I"
+					style = curses.color_pair(3)|curses.A_BOLD
 				else:
-					c = " "
-				win.addstr(channel.pos[0]+offy, x, c, curses.color_pair(2)|curses.A_BOLD)
+					style = curses.color_pair(2)|curses.A_BOLD
+				win.addstr(channel.pos[0]+offy, x, c, style)
 
 def autotrim(param_msg, pot_msg, trims, channels):
 	"""Trims and channels need to be sorted the same"""
