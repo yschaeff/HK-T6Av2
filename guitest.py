@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/python
 
 from message import *
 
@@ -48,7 +48,7 @@ if __name__ == '__main__':
 		#~ serialdev = serial.Serial(
 			#~ port=args.tty, baudrate=args.baud, parity=serial.PARITY_NONE,
 			#~ stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
-		
+
 		if args.download:
 			dump_file = open(args.download, "w")
 			#~ send_msg(request_param_msg(), serialdev)

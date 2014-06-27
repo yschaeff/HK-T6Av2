@@ -34,138 +34,115 @@ def checksum(msg):
 	checksum = (msg[-2]<<8)|msg[-1]
 	return checksum == sum(payload)
 
-def bigend(v):
-	assert len(v) == 2
-	return (v[0]<<8)|v[1]
-
 def endbig(v):
 	return [v>>8, v&0xFF]
 
-def twos(v):
-	if v>>7:
-		return ((~v)+1)&0xF
-	return v
+UINT16 = 0 #enum
+UINT8  = 1
+UINT4H = 2
+UINT4L = 3
+SINT8  = 4
 
-def parse_pot(msg):
-	m = {}
-	m["opcode"] = msg[0]
-	m["CH1"] = bigend(msg[1:3])
-	m["CH2"] = bigend(msg[3:5])
-	m["CH3"] = bigend(msg[5:7])
-	m["CH4"] = bigend(msg[7:9])
-	m["CH5"] = bigend(msg[9:11])
-	m["CH6"] = bigend(msg[11:13])
-	m["?"] = bigend(msg[13:15])
-	m["checksum"] = bigend(msg[15:17])
-	return m
+def uint16(descr, msg):
+	return (msg[descr.offset]<<8)|msg[descr.offset+1]
+def uint8(descr, msg):
+	return msg[descr.offset]
+def uint4h(descr, msg):
+	return msg[descr.offset]>>4
+def uint4l(descr, msg):
+	return msg[descr.offset]&0xF
+def sint8(descr, msg):
+	if msg[descr.offset]>>7:
+		return -(((~msg[descr.offset])+1)&0xFF)
+	return msg[descr.offset]
 
-def parse_request(msg):
-	m = {}
-	m["opcode"] = msg[0]
-	m["?"] = msg[1]
-	return m
+def uint16_store(descr, msg, v):
+	msg[descr.offset] = v>>8
+	msg[descr.offset+1] = v&0xFF
+def uint8_store(descr, msg, v):
+	msg[descr.offset] = v>>8
+	msg[descr.offset+1] = v&0xFF
+def uint4h_store(descr, msg, v):
+	msg[descr.offset] = (v<<4)|(msg[descr.offset]&0xF)
+def uint4l_store(descr, msg, v):
+	msg[descr.offset] = (msg[descr.offset]&0xF0)|(v&0xF)
+def sint8_store(descr, msg, v):
+	if v >= 0:
+		msg[descr.offset] = v&0x7F
+	else:
+		msg[descr.offset] = (v&0xFF)|0x80
 
-def parse_param(msg):
-	m = {}
-	m["opcode"] = msg[0]
-	m["tx model"] = (msg[1]>>4)&0xF
-	m["craft type"] = msg[1]&0xF
+proc = {UINT16:(uint16, uint16_store), UINT8:(uint8, uint8_store),
+	UINT4H:(uint4h, uint4h_store), UINT4L:(uint4l, uint4l_store),
+	SINT8:(sint8, sint8_store)}
 
-	m["CH1 reverse"] = (msg[2]>>0)&0x1
-	m["CH2 reverse"] = (msg[2]>>1)&0x1
-	m["CH3 reverse"] = (msg[2]>>2)&0x1
-	m["CH4 reverse"] = (msg[2]>>3)&0x1
-	m["CH5 reverse"] = (msg[2]>>4)&0x1
-	m["CH6 reverse"] = (msg[2]>>5)&0x1
-	m["CH7 reverse"] = (msg[2]>>6)&0x1
-	m["CH8 reverse"] = (msg[2]>>7)&0x1
 
-	m["CH1 DR on"]  = msg[3]
-	m["CH1 DR off"] = msg[4]
-	m["CH2 DR on"]  = msg[5]
-	m["CH2 DR off"] = msg[6]
-	m["CH4 DR on"]  = msg[7]
-	m["CH4 DR off"] = msg[8]
+class Data:
+	def __init__(self, opc, parser, offset, drange_raw, drange_show, label, pos):
+		self.opc = opc
+		self.parser = parser
+		self.offset = offset
+		self.drange_raw = drange_raw
+		self.drange_show = drange_show
+		if drange_show:
+			assert len(drange_show) == len(drange_raw)
+		self.label = label
+		self.pos = pos
 
-	m["CH1 swash AFR"] = msg[9]
-	m["CH2 swash AFR"] = msg[10]
-	m["CH6 swash AFR"] = msg[11]
+	def read(self, msg):
+		assert self.opc == msg[0]
+		return proc[self.parser][0](self, msg)
+	def write(self, msg, v):
+		assert self.opc == msg[0]
+		return proc[self.parser][1](self, msg, v)
 
-	m["CH1 endpoint left"]  = msg[12]
-	m["CH1 endpoint right"] = msg[13]
-	m["CH2 endpoint left"]  = msg[14]
-	m["CH2 endpoint right"] = msg[15]
-	m["CH3 endpoint left"]  = msg[16]
-	m["CH3 endpoint right"] = msg[17]
-	m["CH4 endpoint left"]  = msg[18]
-	m["CH4 endpoint right"] = msg[19]
-	m["CH5 endpoint left"]  = msg[20]
-	m["CH5 endpoint right"] = msg[21]
-	m["CH6 endpoint left"]  = msg[22]
-	m["CH6 endpoint right"] = msg[23]
+	def dec(self, msg):
+		if not msg: return
+		raw = self.read(msg)
+		if not raw in self.drange_raw:
+			self.write(msg, self.drange_raw[-1])
+		i = self.drange_raw.index(raw)
+		if i == 0: return
+		self.write(msg, self.drange_raw[i-1])
 
-	m["throttlecurve normal EP0"] = msg[24]
-	m["throttlecurve normal EP1"] = msg[26]
-	m["throttlecurve normal EP2"] = msg[28]
-	m["throttlecurve normal EP3"] = msg[30]
-	m["throttlecurve normal EP4"] = msg[32]
-	m["throttlecurve ID EP0"] = msg[25]
-	m["throttlecurve ID EP1"] = msg[27]
-	m["throttlecurve ID EP2"] = msg[29]
-	m["throttlecurve ID EP3"] = msg[31]
-	m["throttlecurve ID EP4"] = msg[33]
+	def inc(self, msg):
+		if not msg: return
+		raw = self.read(msg)
+		if not raw in self.drange_raw:
+			self.write(msg, self.drange_raw[0])
+		i = self.drange_raw.index(raw)
+		if i == len(self.drange_raw)-1: return
+		self.write(msg, self.drange_raw[i+1])
 
-	m["pitchcurve normal EP0"] = msg[34]
-	m["pitchcurve normal EP1"] = msg[36]
-	m["pitchcurve normal EP2"] = msg[38]
-	m["pitchcurve normal EP3"] = msg[40]
-	m["pitchcurve normal EP4"] = msg[42]
-	m["pitchcurve ID EP0"] = msg[35]
-	m["pitchcurve ID EP1"] = msg[37]
-	m["pitchcurve ID EP2"] = msg[39]
-	m["pitchcurve ID EP3"] = msg[41]
-	m["pitchcurve ID EP4"] = msg[43]
 
-	m["CH1 subtrim"] = twos(msg[44])
-	m["CH2 subtrim"] = twos(msg[45])
-	m["CH3 subtrim"] = twos(msg[46])
-	m["CH4 subtrim"] = twos(msg[47])
-	m["CH5 subtrim"] = twos(msg[48])
-	m["CH6 subtrim"] = twos(msg[49])
+	def get(self, msg):
+		"""Return current value in presentation format"""
+		raw = self.read(msg)
+		if not raw in self.drange_raw:
+			return str(raw)+"?"
+		if not self.drange_show:
+			return "%4d"%(raw)
+		i = self.drange_raw.index(raw)
+		return self.drange_show[i]
 
-	m["mix1 source"]      = msg[50]>>4
-	m["mix1 destination"] = msg[50]&0xF
-	m["mix1 uprate"]      = msg[51]
-	m["mix1 downrate"]    = msg[52]
-	m["mix1 switch"]      = msg[53]
-	m["mix2 source"]      = msg[54]>>4
-	m["mix2 destination"] = msg[54]&0xF
-	m["mix2 uprate"]      = msg[55]
-	m["mix2 downrate"]    = msg[56]
-	m["mix2 switch"]      = msg[57]
-	m["mix3 source"]      = msg[58]>>4
-	m["mix3 destination"] = msg[58]&0xF
-	m["mix3 uprate"]      = msg[59]
-	m["mix3 downrate"]    = msg[60]
-	m["mix3 switch"]      = msg[61]
+## TODO storing position in gui here is layer violation
 
-	m["SWA"] = msg[62]
-	m["SWB"] = msg[63]
-	m["VRA"] = msg[64]
-	m["VRB"] = msg[65]
-	
-	return m
+# Accessors
+ch1 = Data(OPC_POT, UINT16,  1, range(1000, 2001), None, "CH1", (1,0))
+ch2 = Data(OPC_POT, UINT16,  3, range(1000, 2001), None, "CH2", (2,0))
+ch3 = Data(OPC_POT, UINT16,  5, range(1000, 2001), None, "CH3", (3,0))
+ch4 = Data(OPC_POT, UINT16,  7, range(1000, 2001), None, "CH4", (4,0))
+ch5 = Data(OPC_POT, UINT16,  9, range(1000, 2001), None, "CH5", (5,0))
+ch6 = Data(OPC_POT, UINT16, 11, range(1000, 2001), None, "CH6", (6,0))
 
-def parse(msg):
-	assert msg
-	assert len(msg) > 0
-	assert msg[0] in MSGMAP
-	assert len(msg) == MSGMAP[msg[0]]
+ch1_subtrim = Data(OPC_PARAM_DUMP, SINT8, 44, range(-128, 128), None, "CH1 subtrim", (0,0))
+ch2_subtrim = Data(OPC_PARAM_DUMP, SINT8, 45, range(-128, 128), None, "CH2 subtrim", (1,0))
+ch3_subtrim = Data(OPC_PARAM_DUMP, SINT8, 46, range(-128, 128), None, "CH3 subtrim", (2,0))
+ch4_subtrim = Data(OPC_PARAM_DUMP, SINT8, 47, range(-128, 128), None, "CH4 subtrim", (3,0))
+ch5_subtrim = Data(OPC_PARAM_DUMP, SINT8, 48, range(-128, 128), None, "CH5 subtrim", (4,0))
+ch6_subtrim = Data(OPC_PARAM_DUMP, SINT8, 49, range(-128, 128), None, "CH6 subtrim", (5,0))
 
-	parser = {
-		OPC_PARAM_REQUEST:parse_request,
-		OPC_POT:parse_pot,
-		OPC_PARAM_DUMP:parse_param,
-		OPC_PARAM_LOAD:parse_param
-	}
-	return parser[msg[0]](msg)
+# Accessor collections
+channels = [ch1, ch2, ch3, ch4, ch5, ch6]
+trims = [ch1_subtrim, ch2_subtrim, ch3_subtrim, ch4_subtrim, ch5_subtrim, ch6_subtrim]
+datas = trims+[]
