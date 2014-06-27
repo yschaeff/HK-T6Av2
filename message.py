@@ -42,6 +42,14 @@ UINT8  = 1
 UINT4H = 2
 UINT4L = 3
 SINT8  = 4
+BIT1   = 5
+BIT2   = 6
+BIT3   = 7
+BIT4   = 8
+BIT5   = 9
+BIT6   = 10
+BIT7   = 11
+BIT8   = 12
 
 def uint16(descr, msg):
 	return (msg[descr.offset]<<8)|msg[descr.offset+1]
@@ -55,6 +63,22 @@ def sint8(descr, msg):
 	if msg[descr.offset]>>7:
 		return -(((~msg[descr.offset])+1)&0xFF)
 	return msg[descr.offset]
+def bit1(descr, msg):
+	return (msg[descr.offset]>>0)&0x1
+def bit2(descr, msg):
+	return (msg[descr.offset]>>1)&0x1
+def bit3(descr, msg):
+	return (msg[descr.offset]>>2)&0x1
+def bit4(descr, msg):
+	return (msg[descr.offset]>>3)&0x1
+def bit5(descr, msg):
+	return (msg[descr.offset]>>4)&0x1
+def bit6(descr, msg):
+	return (msg[descr.offset]>>5)&0x1
+def bit7(descr, msg):
+	return (msg[descr.offset]>>6)&0x1
+def bit8(descr, msg):
+	return (msg[descr.offset]>>7)&0x1
 
 def uint16_store(descr, msg, v):
 	msg[descr.offset] = v>>8
@@ -70,10 +94,30 @@ def sint8_store(descr, msg, v):
 		msg[descr.offset] = v&0x7F
 	else:
 		msg[descr.offset] = (v&0xFF)|0x80
+def bit1_store(descr, msg, v):
+	msg[descr.offset] = (msg[descr.offset]&0xFE)|(v&0x1)<<0
+def bit2_store(descr, msg, v):
+	msg[descr.offset] = (msg[descr.offset]&0xFD)|(v&0x1)<<1
+def bit3_store(descr, msg, v):
+	msg[descr.offset] = (msg[descr.offset]&0xFB)|(v&0x1)<<2
+def bit4_store(descr, msg, v):
+	msg[descr.offset] = (msg[descr.offset]&0xF7)|(v&0x1)<<3
+def bit5_store(descr, msg, v):
+	msg[descr.offset] = (msg[descr.offset]&0xEF)|(v&0x1)<<4
+def bit6_store(descr, msg, v):
+	msg[descr.offset] = (msg[descr.offset]&0xDF)|(v&0x1)<<5
+def bit7_store(descr, msg, v):
+	msg[descr.offset] = (msg[descr.offset]&0xBF)|(v&0x1)<<6
+def bit8_store(descr, msg, v):
+	msg[descr.offset] = (msg[descr.offset]&0x7F)|(v&0x1)<<7
 
 proc = {UINT16:(uint16, uint16_store), UINT8:(uint8, uint8_store),
 	UINT4H:(uint4h, uint4h_store), UINT4L:(uint4l, uint4l_store),
-	SINT8:(sint8, sint8_store)}
+	SINT8:(sint8, sint8_store), BIT1:(bit1, bit1_store),
+	BIT2:(bit2, bit2_store), BIT3:(bit3, bit3_store),
+	BIT4:(bit4, bit4_store), BIT5:(bit5, bit5_store),
+	BIT6:(bit6, bit6_store), BIT7:(bit7, bit7_store),
+	BIT8:(bit8, bit8_store)}
 
 
 class Data:
@@ -143,19 +187,29 @@ ch4_subtrim = Data(OPC_PARAM_DUMP, SINT8, 47, range(-128, 128), None, "CH4 subtr
 ch5_subtrim = Data(OPC_PARAM_DUMP, SINT8, 48, range(-128, 128), None, "CH5 subtrim", (4,0))
 ch6_subtrim = Data(OPC_PARAM_DUMP, SINT8, 49, range(-128, 128), None, "CH6 subtrim", (5,0))
 
-ch1_end_left = Data(OPC_PARAM_DUMP, UINT8, 11, range(80, 121), None, "CH1 End Left", (0,20))
-ch2_end_left = Data(OPC_PARAM_DUMP, UINT8, 13, range(80, 121), None, "CH2 End Left", (1,20))
-ch3_end_left = Data(OPC_PARAM_DUMP, UINT8, 15, range(80, 121), None, "CH3 End Left", (2,20))
-ch4_end_left = Data(OPC_PARAM_DUMP, UINT8, 17, range(80, 121), None, "CH4 End Left", (3,20))
-ch5_end_left = Data(OPC_PARAM_DUMP, UINT8, 19, range(80, 121), None, "CH5 End Left", (4,20))
-ch6_end_left = Data(OPC_PARAM_DUMP, UINT8, 21, range(80, 121), None, "CH6 End Left", (5,20))
+ch1_end_left = Data(OPC_PARAM_DUMP, UINT8, 11, range(128), None, "CH1 End Left", (0,20))
+ch2_end_left = Data(OPC_PARAM_DUMP, UINT8, 13, range(128), None, "CH2 End Left", (1,20))
+ch3_end_left = Data(OPC_PARAM_DUMP, UINT8, 15, range(128), None, "CH3 End Left", (2,20))
+ch4_end_left = Data(OPC_PARAM_DUMP, UINT8, 17, range(128), None, "CH4 End Left", (3,20))
+ch5_end_left = Data(OPC_PARAM_DUMP, UINT8, 19, range(128), None, "CH5 End Left", (4,20))
+ch6_end_left = Data(OPC_PARAM_DUMP, UINT8, 21, range(128), None, "CH6 End Left", (5,20))
 
-ch1_end_right = Data(OPC_PARAM_DUMP, UINT8, 12, range(80, 121), None, "CH1 End Right", (0,41))
-ch2_end_right = Data(OPC_PARAM_DUMP, UINT8, 14, range(80, 121), None, "CH2 End Right", (1,41))
-ch3_end_right = Data(OPC_PARAM_DUMP, UINT8, 16, range(80, 121), None, "CH3 End Right", (2,41))
-ch4_end_right = Data(OPC_PARAM_DUMP, UINT8, 18, range(80, 121), None, "CH4 End Right", (3,41))
-ch5_end_right = Data(OPC_PARAM_DUMP, UINT8, 20, range(80, 121), None, "CH5 End Right", (4,41))
-ch6_end_right = Data(OPC_PARAM_DUMP, UINT8, 22, range(80, 121), None, "CH6 End Right", (5,41))
+ch1_end_right = Data(OPC_PARAM_DUMP, UINT8, 12, range(128), None, "CH1 End Right", (0,41))
+ch2_end_right = Data(OPC_PARAM_DUMP, UINT8, 14, range(128), None, "CH2 End Right", (1,41))
+ch3_end_right = Data(OPC_PARAM_DUMP, UINT8, 16, range(128), None, "CH3 End Right", (2,41))
+ch4_end_right = Data(OPC_PARAM_DUMP, UINT8, 18, range(128), None, "CH4 End Right", (3,41))
+ch5_end_right = Data(OPC_PARAM_DUMP, UINT8, 20, range(128), None, "CH5 End Right", (4,41))
+ch6_end_right = Data(OPC_PARAM_DUMP, UINT8, 22, range(128), None, "CH6 End Right", (5,41))
+
+tx_mode = Data(OPC_PARAM_DUMP, UINT4H, 1, range(4), ["model1", "model2", "model3", "model4"], "TX mode", (7,0))
+craft_type = Data(OPC_PARAM_DUMP, UINT4L, 1, range(4), ["acro", "heli120", "heli90", "heli140"], "Craft Type", (8,0))
+
+ch1_reverse = Data(OPC_PARAM_DUMP, BIT1, 2, range(2), ["off", "on"], "CH1 Reverse", (0,64))
+ch2_reverse = Data(OPC_PARAM_DUMP, BIT2, 2, range(2), ["off", "on"], "CH2 Reverse", (1,64))
+ch3_reverse = Data(OPC_PARAM_DUMP, BIT3, 2, range(2), ["off", "on"], "CH3 Reverse", (2,64))
+ch4_reverse = Data(OPC_PARAM_DUMP, BIT4, 2, range(2), ["off", "on"], "CH4 Reverse", (3,64))
+ch5_reverse = Data(OPC_PARAM_DUMP, BIT5, 2, range(2), ["off", "on"], "CH5 Reverse", (4,64))
+ch6_reverse = Data(OPC_PARAM_DUMP, BIT6, 2, range(2), ["off", "on"], "CH6 Reverse", (5,64))
 
 # Accessor collections
 channels = [ch1, ch2, ch3, ch4, ch5, ch6]
@@ -163,4 +217,5 @@ trims = [ch1_subtrim, ch2_subtrim, ch3_subtrim, ch4_subtrim, ch5_subtrim, ch6_su
 endpoints = [ch1_end_left, ch2_end_left, ch3_end_left, ch4_end_left,
 	ch5_end_left, ch6_end_left, ch1_end_right, ch2_end_right,
 	ch3_end_right, ch4_end_right, ch5_end_right, ch6_end_right]
-datas = trims+endpoints
+reverse = [ch1_reverse, ch2_reverse, ch3_reverse, ch4_reverse, ch5_reverse, ch6_reverse]
+datas = trims+endpoints+[tx_mode, craft_type]+reverse

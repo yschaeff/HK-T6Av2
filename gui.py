@@ -37,7 +37,7 @@ def autotrim(param_msg, pot_msg, trims, channels):
 	for tr, ch in zip(trims, channels):
 		d = 1500 - ch.read(pot_msg)
 		t = tr.read(param_msg)
-		v = t - d
+		v = t + d
 		if v < -128: v = -128
 		if v > 127: v = 127
 		tr.write(param_msg, v)
