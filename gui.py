@@ -52,7 +52,10 @@ def draw_param(win, offy, offx, msg, selected, datas):
 			style = curses.color_pair(2)
 			form = "%s: <%s>"
 		else:
-			style = curses.color_pair(3)
+			if data.changed:
+				style = curses.color_pair(1)
+			else:
+				style = curses.color_pair(3)
 			form = "%s: %s"
 		y = offy + data.pos[0]
 		x = offx + data.pos[1]
@@ -95,6 +98,8 @@ def gui(stdscr, inqueue, outqueue):
 				break  # Exit the while()
 			elif c == ord('d'):
 				outqueue.put(request_param_msg())
+				for d in datas:
+					d.changed = False
 			elif c == ord('u') and last_param_msg:
 				outqueue.put(load_param_msg(last_param_msg[1:-2]))
 			elif c == ord('a') and last_param_msg:
@@ -105,8 +110,10 @@ def gui(stdscr, inqueue, outqueue):
 				index = (index-1)%len(datas)
 			elif c == curses.KEY_LEFT:
 				datas[index].dec(last_param_msg)
+				datas[index].changed = True
 			elif c == curses.KEY_RIGHT:
 				datas[index].inc(last_param_msg)
+				datas[index].changed = True
 
 		try:
 			m = inqueue.get(timeout=1)

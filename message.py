@@ -88,6 +88,7 @@ class Data:
 			assert len(drange_show) == len(drange_raw)
 		self.label = label
 		self.pos = pos
+		self.changed = False
 
 	def read(self, msg):
 		assert self.opc == msg[0]
