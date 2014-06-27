@@ -56,7 +56,7 @@ def draw_param(win, offy, offx, msg, selected, datas):
 				style = curses.color_pair(1)
 			else:
 				style = curses.color_pair(3)
-			form = "%s: %s"
+			form = "%s:  %s"
 		y = offy + data.pos[0]
 		x = offx + data.pos[1]
 		win.addstr(y, x, form%(data.label, v), style)

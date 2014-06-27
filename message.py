@@ -60,8 +60,7 @@ def uint16_store(descr, msg, v):
 	msg[descr.offset] = v>>8
 	msg[descr.offset+1] = v&0xFF
 def uint8_store(descr, msg, v):
-	msg[descr.offset] = v>>8
-	msg[descr.offset+1] = v&0xFF
+	msg[descr.offset] = v
 def uint4h_store(descr, msg, v):
 	msg[descr.offset] = (v<<4)|(msg[descr.offset]&0xF)
 def uint4l_store(descr, msg, v):
@@ -102,6 +101,7 @@ class Data:
 		raw = self.read(msg)
 		if not raw in self.drange_raw:
 			self.write(msg, self.drange_raw[-1])
+			return
 		i = self.drange_raw.index(raw)
 		if i == 0: return
 		self.write(msg, self.drange_raw[i-1])
@@ -111,6 +111,7 @@ class Data:
 		raw = self.read(msg)
 		if not raw in self.drange_raw:
 			self.write(msg, self.drange_raw[0])
+			return
 		i = self.drange_raw.index(raw)
 		if i == len(self.drange_raw)-1: return
 		self.write(msg, self.drange_raw[i+1])
@@ -119,7 +120,7 @@ class Data:
 		"""Return current value in presentation format"""
 		raw = self.read(msg)
 		if not raw in self.drange_raw:
-			return str(raw)+"?"
+			return "%3d?"%raw
 		if not self.drange_show:
 			return "%4d"%(raw)
 		i = self.drange_raw.index(raw)
@@ -142,7 +143,24 @@ ch4_subtrim = Data(OPC_PARAM_DUMP, SINT8, 47, range(-128, 128), None, "CH4 subtr
 ch5_subtrim = Data(OPC_PARAM_DUMP, SINT8, 48, range(-128, 128), None, "CH5 subtrim", (4,0))
 ch6_subtrim = Data(OPC_PARAM_DUMP, SINT8, 49, range(-128, 128), None, "CH6 subtrim", (5,0))
 
+ch1_end_left = Data(OPC_PARAM_DUMP, UINT8, 11, range(80, 121), None, "CH1 End Left", (0,20))
+ch2_end_left = Data(OPC_PARAM_DUMP, UINT8, 13, range(80, 121), None, "CH2 End Left", (1,20))
+ch3_end_left = Data(OPC_PARAM_DUMP, UINT8, 15, range(80, 121), None, "CH3 End Left", (2,20))
+ch4_end_left = Data(OPC_PARAM_DUMP, UINT8, 17, range(80, 121), None, "CH4 End Left", (3,20))
+ch5_end_left = Data(OPC_PARAM_DUMP, UINT8, 19, range(80, 121), None, "CH5 End Left", (4,20))
+ch6_end_left = Data(OPC_PARAM_DUMP, UINT8, 21, range(80, 121), None, "CH6 End Left", (5,20))
+
+ch1_end_right = Data(OPC_PARAM_DUMP, UINT8, 12, range(80, 121), None, "CH1 End Right", (0,41))
+ch2_end_right = Data(OPC_PARAM_DUMP, UINT8, 14, range(80, 121), None, "CH2 End Right", (1,41))
+ch3_end_right = Data(OPC_PARAM_DUMP, UINT8, 16, range(80, 121), None, "CH3 End Right", (2,41))
+ch4_end_right = Data(OPC_PARAM_DUMP, UINT8, 18, range(80, 121), None, "CH4 End Right", (3,41))
+ch5_end_right = Data(OPC_PARAM_DUMP, UINT8, 20, range(80, 121), None, "CH5 End Right", (4,41))
+ch6_end_right = Data(OPC_PARAM_DUMP, UINT8, 22, range(80, 121), None, "CH6 End Right", (5,41))
+
 # Accessor collections
 channels = [ch1, ch2, ch3, ch4, ch5, ch6]
 trims = [ch1_subtrim, ch2_subtrim, ch3_subtrim, ch4_subtrim, ch5_subtrim, ch6_subtrim]
-datas = trims+[]
+endpoints = [ch1_end_left, ch2_end_left, ch3_end_left, ch4_end_left,
+	ch5_end_left, ch6_end_left, ch1_end_right, ch2_end_right,
+	ch3_end_right, ch4_end_right, ch5_end_right, ch6_end_right]
+datas = trims+endpoints
