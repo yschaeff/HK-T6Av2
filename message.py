@@ -214,14 +214,61 @@ ch6_reverse = Data(OPC_PARAM_DUMP, BIT6, 2, range(2), ["off", "on"], "CH6 Revers
 ch1_dr_off = Data(OPC_PARAM_DUMP, UINT8, 3, range(128), None, "CH1 DR Off", (7,20))
 ch2_dr_off = Data(OPC_PARAM_DUMP, UINT8, 5, range(128), None, "CH2 DR Off", (8,20))
 ch4_dr_off = Data(OPC_PARAM_DUMP, UINT8, 7, range(128), None, "CH4 DR Off", (9,20))
+
 ch1_dr_on = Data(OPC_PARAM_DUMP, UINT8, 4, range(128), None, "CH1 DR On", (7,41))
 ch2_dr_on = Data(OPC_PARAM_DUMP, UINT8, 6, range(128), None, "CH2 DR On", (8,41))
 ch4_dr_on = Data(OPC_PARAM_DUMP, UINT8, 8, range(128), None, "CH4 DR On", (9,41))
+
+ch1_swash = Data(OPC_PARAM_DUMP, SINT8, 9, range(-128, 128), None, "CH1 Swash AFR", (7,64))
+ch2_swash = Data(OPC_PARAM_DUMP, SINT8, 10, range(-128, 128), None, "CH2 Swash AFR", (8,64))
+ch6_swash = Data(OPC_PARAM_DUMP, SINT8, 11, range(-128, 128), None, "CH6 Swash AFR", (9,64))
 
 swa = Data(OPC_PARAM_DUMP, UINT8, 62, range(4), ["None", "Dual Rate", "Trottlecut", "Nor/ID"], "Switch A", (9,0))
 swb = Data(OPC_PARAM_DUMP, UINT8, 63, range(4), ["None", "Dual Rate", "Trottlecut", "Nor/ID"], "Switch B", (10,0))
 vra = Data(OPC_PARAM_DUMP, UINT8, 64, range(2), ["None", "Pitch Adj"], "VR A", (11,0))
 vrb = Data(OPC_PARAM_DUMP, UINT8, 65, range(2), ["None", "Pitch Adj"], "VR B", (12,0))
+
+thrcrv_norm_0 = Data(OPC_PARAM_DUMP, UINT8, 24, range(128), None, "Throttle Curve Normal P0", (14,0))
+thrcrv_norm_1 = Data(OPC_PARAM_DUMP, UINT8, 26, range(128), None, "Throttle Curve Normal P1", (15,0))
+thrcrv_norm_2 = Data(OPC_PARAM_DUMP, UINT8, 28, range(128), None, "Throttle Curve Normal P2", (16,0))
+thrcrv_norm_3 = Data(OPC_PARAM_DUMP, UINT8, 30, range(128), None, "Throttle Curve Normal P3", (17,0))
+thrcrv_norm_4 = Data(OPC_PARAM_DUMP, UINT8, 32, range(128), None, "Throttle Curve Normal P4", (18,0))
+thrcrv_idle_0 = Data(OPC_PARAM_DUMP, UINT8, 25, range(128), None, "Throttle Curve Idle P0", (14,33))
+thrcrv_idle_1 = Data(OPC_PARAM_DUMP, UINT8, 27, range(128), None, "Throttle Curve Idle P1", (15,33))
+thrcrv_idle_2 = Data(OPC_PARAM_DUMP, UINT8, 29, range(128), None, "Throttle Curve Idle P2", (16,33))
+thrcrv_idle_3 = Data(OPC_PARAM_DUMP, UINT8, 31, range(128), None, "Throttle Curve Idle P3", (17,33))
+thrcrv_idle_4 = Data(OPC_PARAM_DUMP, UINT8, 33, range(128), None, "Throttle Curve Idle P4", (18,33))
+
+ptchcrv_norm_0 = Data(OPC_PARAM_DUMP, UINT8, 34, range(128), None, "Pitch Curve Normal P0", (21,0))
+ptchcrv_norm_1 = Data(OPC_PARAM_DUMP, UINT8, 36, range(128), None, "Pitch Curve Normal P1", (22,0))
+ptchcrv_norm_2 = Data(OPC_PARAM_DUMP, UINT8, 38, range(128), None, "Pitch Curve Normal P2", (23,0))
+ptchcrv_norm_3 = Data(OPC_PARAM_DUMP, UINT8, 40, range(128), None, "Pitch Curve Normal P3", (24,0))
+ptchcrv_norm_4 = Data(OPC_PARAM_DUMP, UINT8, 42, range(128), None, "Pitch Curve Normal P4", (25,0))
+ptchcrv_idle_0 = Data(OPC_PARAM_DUMP, UINT8, 35, range(128), None, "Pitch Curve Idle P0", (21,33))
+ptchcrv_idle_1 = Data(OPC_PARAM_DUMP, UINT8, 37, range(128), None, "Pitch Curve Idle P1", (22,33))
+ptchcrv_idle_2 = Data(OPC_PARAM_DUMP, UINT8, 39, range(128), None, "Pitch Curve Idle P2", (23,33))
+ptchcrv_idle_3 = Data(OPC_PARAM_DUMP, UINT8, 41, range(128), None, "Pitch Curve Idle P3", (24,33))
+ptchcrv_idle_4 = Data(OPC_PARAM_DUMP, UINT8, 43, range(128), None, "Pitch Curve Idle P4", (25,33))
+
+mix1_src = Data(OPC_PARAM_DUMP, UINT4H, 50, range(8), ["CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "VRA", "VRB"], "Mix1 Source", (0,86))
+mix1_dst = Data(OPC_PARAM_DUMP, UINT4L, 50, range(6), ["CH1", "CH2", "CH3", "CH4", "CH5", "CH6"], "Mix1 Dest", (1,86))
+mix1_upr = Data(OPC_PARAM_DUMP, UINT8, 51, range(128), None, "Mix1 Uprate", (2,86))
+mix1_dwr = Data(OPC_PARAM_DUMP, UINT8, 52, range(128), None, "Mix1 Downrate", (3,86))
+mix1_sw  = Data(OPC_PARAM_DUMP, UINT8, 53, range(4), ["Switch A", "Switch B", "Always On", "Always Off"], "Mix1 Switch", (4,86))
+mix2_src = Data(OPC_PARAM_DUMP, UINT4H, 54, range(8), ["CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "VRA", "VRB"], "Mix2 Source", (6,86))
+mix2_dst = Data(OPC_PARAM_DUMP, UINT4L, 54, range(6), ["CH1", "CH2", "CH3", "CH4", "CH5", "CH6"], "Mix2 Dest", (7,86))
+mix2_upr = Data(OPC_PARAM_DUMP, UINT8, 55, range(128), None, "Mix2 Uprate", (8,86))
+mix2_dwr = Data(OPC_PARAM_DUMP, UINT8, 56, range(128), None, "Mix2 Downrate", (9,86))
+mix2_sw  = Data(OPC_PARAM_DUMP, UINT8, 57, range(4), ["Switch A", "Switch B", "Always On", "Always Off"], "Mix2 Switch", (10,86))
+mix3_src = Data(OPC_PARAM_DUMP, UINT4H, 58, range(8), ["CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "VRA", "VRB"], "Mix3 Source", (12,86))
+mix3_dst = Data(OPC_PARAM_DUMP, UINT4L, 58, range(6), ["CH1", "CH2", "CH3", "CH4", "CH5", "CH6"], "Mix3 Dest", (13,86))
+mix3_upr = Data(OPC_PARAM_DUMP, UINT8, 59, range(128), None, "Mix3 Uprate", (14,86))
+mix3_dwr = Data(OPC_PARAM_DUMP, UINT8, 60, range(128), None, "Mix3 Downrate", (15,86))
+mix3_sw  = Data(OPC_PARAM_DUMP, UINT8, 61, range(4), ["Switch A", "Switch B", "Always On", "Always Off"], "Mix3 Switch", (16,86))
+
+mixes = [mix1_src, mix1_dst, mix1_upr, mix1_dwr, mix1_sw,
+		mix2_src, mix2_dst, mix2_upr, mix2_dwr, mix2_sw,
+		mix3_src, mix3_dst, mix3_upr, mix3_dwr, mix3_sw] 
 
 # Accessor collections
 channels = [ch1, ch2, ch3, ch4, ch5, ch6]
@@ -232,4 +279,10 @@ endpoints = [ch1_end_left, ch2_end_left, ch3_end_left, ch4_end_left,
 reverse = [ch1_reverse, ch2_reverse, ch3_reverse, ch4_reverse, ch5_reverse, ch6_reverse]
 dr = [ch1_dr_on,  ch2_dr_on, ch4_dr_on, ch1_dr_off, ch2_dr_off, ch4_dr_off]
 
-datas = trims+endpoints+[tx_mode, craft_type]+reverse + dr + [swa, swb, vra, vrb]
+
+thr_curve = [thrcrv_norm_0, thrcrv_norm_1, thrcrv_norm_2, thrcrv_norm_3, thrcrv_norm_4,
+	thrcrv_idle_0, thrcrv_idle_1, thrcrv_idle_2, thrcrv_idle_3, thrcrv_idle_4]
+ptch_curve = [ptchcrv_norm_0, ptchcrv_norm_1, ptchcrv_norm_2, ptchcrv_norm_3, ptchcrv_norm_4,
+	ptchcrv_idle_0, ptchcrv_idle_1, ptchcrv_idle_2, ptchcrv_idle_3, ptchcrv_idle_4]
+
+datas = trims+endpoints+[tx_mode, craft_type]+reverse + dr + [swa, swb, vra, vrb] + [ch1_swash, ch2_swash, ch6_swash] + thr_curve + ptch_curve + mixes

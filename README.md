@@ -64,13 +64,13 @@ and parameter set.
   * [17] Left [18] Right CH4
   * [19] Left [20] Right CH5
   * [21] Left [22] Right CH6
-* Byte [23-32]: Throttle curve, in percent
+* Byte [23-32]: Throttle curve [0-127]
   * [23] Normal [24] ID EP0
   * [25] Normal [26] ID EP1
   * [27] Normal [28] ID EP2
   * [29] Normal [30] ID EP3
   * [31] Normal [32] ID EP4
-* Byte [33-42]: Pitch curve, in percent
+* Byte [33-42]: Pitch curve [0-127]
   * [33] Normal [34] ID EP0
   * [35] Normal [36] ID EP1
   * [37] Normal [38] ID EP2
