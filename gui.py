@@ -8,7 +8,7 @@ def draw_pot(win, offy, offx, msg, channels):
 	if not msg: return
 	for channel in channels:
 		win.addstr(channel.pos[0]+offy, offx, channel.label)
-		win.addstr(channel.pos[0]+offy, offx+len(channel.label)+1, channel.get(msg))
+		win.addstr(channel.pos[0]+offy, offx+len(channel.label)+1, str(channel.read(msg)))
 		h,w = win.getmaxyx()
 		t,l = win.getbegyx()
 		l += 9 + offx
@@ -98,12 +98,8 @@ def gui(stdscr, inqueue, outqueue):
 				break  # Exit the while()
 			elif c == ord('d'):
 				outqueue.put(request_param_msg())
-				for d in datas:
-					d.changed = False
 			elif c == ord('u') and last_param_msg:
 				outqueue.put(load_param_msg(last_param_msg[1:-2]))
-				for d in datas:
-					d.changed = False
 			elif c == ord('a') and last_param_msg:
 				autotrim(last_param_msg, last_pot_msg, trims, channels)
 			elif c == curses.KEY_DOWN:
@@ -118,7 +114,7 @@ def gui(stdscr, inqueue, outqueue):
 				datas[index].changed = True
 
 		try:
-			m = inqueue.get(timeout=1)
+			m = inqueue.get(timeout=0.05)
 		except Queue.Empty:
 			continue
 		if not m:
@@ -127,6 +123,9 @@ def gui(stdscr, inqueue, outqueue):
 			last_pot_msg = m
 		elif m[0] == OPC_PARAM_DUMP:
 			last_param_msg = m
+			for d in datas:
+				d.changed = False
+
 
 def gui_loop(inqueue, outqueue):
 	curses.wrapper(gui, inqueue, outqueue)
