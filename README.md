@@ -46,18 +46,18 @@ and parameter set.
   *Resp. Acro, heli120, heli90, heli140
 * Byte [1]: Reverse. Bitmask.
   * CH8 first, CH1 last. 0 off, 1 on.
-* Byte [2-7]: DR values **(percent? CHECKME)**
-  * [2] CH1, DR on value
-  * [3] CH1, DR off value
-  * [4] CH2, DR on value
-  * [5] CH2, DR off value
-  * [6] CH4, DR on value
-  * [7] CH4, DR off value
+* Byte [2-7]: DR values [0-127]
+  * [2] CH1, DR off value
+  * [3] CH1, DR on value
+  * [4] CH2, DR off value
+  * [5] CH2, DR on value
+  * [6] CH4, DR off value
+  * [7] CH4, DR on value
 * Byte [8-10]: Swash AFR in percent
   * [8] CH1
   * [9] CH2
   * [10] CH6
-* Byte [11-22]: End points for potmeters, in percent. **(min CHECKME max 120)**
+* Byte [11-22]: End points for potmeters, [0-127]
   * [11] Left [12] Right CH1
   * [13] Left [14] Right CH2
   * [15] Left [16] Right CH3

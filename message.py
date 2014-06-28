@@ -211,6 +211,18 @@ ch4_reverse = Data(OPC_PARAM_DUMP, BIT4, 2, range(2), ["off", "on"], "CH4 Revers
 ch5_reverse = Data(OPC_PARAM_DUMP, BIT5, 2, range(2), ["off", "on"], "CH5 Reverse", (4,64))
 ch6_reverse = Data(OPC_PARAM_DUMP, BIT6, 2, range(2), ["off", "on"], "CH6 Reverse", (5,64))
 
+ch1_dr_off = Data(OPC_PARAM_DUMP, UINT8, 3, range(128), None, "CH1 DR Off", (7,20))
+ch2_dr_off = Data(OPC_PARAM_DUMP, UINT8, 5, range(128), None, "CH2 DR Off", (8,20))
+ch4_dr_off = Data(OPC_PARAM_DUMP, UINT8, 7, range(128), None, "CH4 DR Off", (9,20))
+ch1_dr_on = Data(OPC_PARAM_DUMP, UINT8, 4, range(128), None, "CH1 DR On", (7,41))
+ch2_dr_on = Data(OPC_PARAM_DUMP, UINT8, 6, range(128), None, "CH2 DR On", (8,41))
+ch4_dr_on = Data(OPC_PARAM_DUMP, UINT8, 8, range(128), None, "CH4 DR On", (9,41))
+
+swa = Data(OPC_PARAM_DUMP, UINT8, 62, range(4), ["None", "Dual Rate", "Trottlecut", "Nor/ID"], "Switch A", (9,0))
+swb = Data(OPC_PARAM_DUMP, UINT8, 63, range(4), ["None", "Dual Rate", "Trottlecut", "Nor/ID"], "Switch B", (10,0))
+vra = Data(OPC_PARAM_DUMP, UINT8, 64, range(2), ["None", "Pitch Adj"], "VR A", (11,0))
+vrb = Data(OPC_PARAM_DUMP, UINT8, 65, range(2), ["None", "Pitch Adj"], "VR B", (12,0))
+
 # Accessor collections
 channels = [ch1, ch2, ch3, ch4, ch5, ch6]
 trims = [ch1_subtrim, ch2_subtrim, ch3_subtrim, ch4_subtrim, ch5_subtrim, ch6_subtrim]
@@ -218,4 +230,6 @@ endpoints = [ch1_end_left, ch2_end_left, ch3_end_left, ch4_end_left,
 	ch5_end_left, ch6_end_left, ch1_end_right, ch2_end_right,
 	ch3_end_right, ch4_end_right, ch5_end_right, ch6_end_right]
 reverse = [ch1_reverse, ch2_reverse, ch3_reverse, ch4_reverse, ch5_reverse, ch6_reverse]
-datas = trims+endpoints+[tx_mode, craft_type]+reverse
+dr = [ch1_dr_on,  ch2_dr_on, ch4_dr_on, ch1_dr_off, ch2_dr_off, ch4_dr_off]
+
+datas = trims+endpoints+[tx_mode, craft_type]+reverse + dr + [swa, swb, vra, vrb]
