@@ -1,7 +1,31 @@
 HK-T6Av2
 ========
-
 Serial protocol desciption between computer and HK-T6Av2 RC remote
+
+In this directory you will find a program to configure your Hobby King
+remote control from Linux. Further down in this document the full
+protocol specification is written down as sniffed from the wire by me.
+
+Usage:
+> python hkctrl.py [-h] [-t TTY] [-b BAUDRATE] [-u FILE | -d FILE]
+> 
+> HK-T6A V2 configuration tool
+> 
+> optional arguments:
+>   -h, --help            show this help message and exit
+>   -t TTY, --tty TTY     Serial port. Default /dev/ttyUSB0
+>   -b BAUDRATE, --baud BAUDRATE
+>                         Transmitter baudrate. Default 115200
+>   -u FILE, --upload FILE
+>                         Load config in to transmitter and exit. Make sure
+>                         transmitter is switched on prior to running program.
+>   -d FILE, --download FILE
+>                         Dump config from transmitter and exit. Make sure
+>                         transmitter is switched on prior to running program.
+
+With the -d and -u options you can backup/restore tranmitter settings.
+Without those arguments the program will launch a GUI. (I expect
+backup/restore to work on MS Windows as well.)
 
 # HK-T6Av2 Protocol
 The serial port of the transmitter is set at 115200 baud. I've seen 4
