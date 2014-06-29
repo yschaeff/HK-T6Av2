@@ -37,15 +37,19 @@ def draw_pot(win, offy, offx, msg, channels):
 					style = CP_SELECT
 				win.addstr(offy+i, x, c, curses.color_pair(style))
 
-def autotrim(param_msg, pot_msg, trims, channels):
+def autotrim(param_msg, pot_msg, trims, channels, reverse):
 	"""Trims and channels need to be sorted the same"""
-	for tr, ch in zip(trims, channels):
+	for tr, ch, rev in zip(trims, channels, reverse)[:4]:
 		d = 1500 - ch.read(pot_msg)
 		t = tr.read(param_msg)
-		v = t + d
+		if not rev.read(param_msg):
+			v = t + d
+		else:
+			v = t - d
 		if v < -128: v = -128
 		if v > 127: v = 127
 		tr.write(param_msg, v)
+		tr.changed = True
 
 def draw_column(win, y, x, msg, selected, title, fields, form):
 	
@@ -112,7 +116,7 @@ def draw_param(win, offy, offx, msg, selected, datas):
 	draw_column(win, offy+10, offx+50, msg, selected, "Mode", [tx_mode, craft_type], "%7s")
 
 def draw_legenda(win, offy, offx):
-	win.addstr(offy+0, offx, "d: download, u: upload, a: auto-trim, q: quit",
+	win.addstr(offy+0, offx, "d: download, u: upload, a: auto-trim, q: quit, arrow keys",
 		curses.color_pair(0)|curses.A_BOLD)
 
 def draw_help(win, offy, offx, index, datas):
@@ -154,7 +158,7 @@ def gui(stdscr, inqueue, outqueue):
 			elif c == ord('u') and last_param_msg:
 				outqueue.put(load_param_msg(last_param_msg[1:-2]))
 			elif c == ord('a') and last_param_msg:
-				autotrim(last_param_msg, last_pot_msg, trims, channels)
+				autotrim(last_param_msg, last_pot_msg, trims, channels, reverse)
 			elif c == curses.KEY_DOWN:
 				index = (index+1)%len(datas)
 			elif c == curses.KEY_UP:
