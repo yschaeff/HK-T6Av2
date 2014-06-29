@@ -116,9 +116,10 @@ def draw_legenda(win, offy, offx):
 		curses.color_pair(0)|curses.A_BOLD)
 
 def draw_help(win, offy, offx, index, datas):
+	win.move(offy,   offx); win.clrtoeol()
+	win.move(offy+1, offx); win.clrtoeol()
 	win.addstr(offy+0, offx, datas[index].label + ": " + datas[index].helpstr,
 		curses.color_pair(0))
-	win.clrtoeol()
 	
 
 def gui(stdscr, inqueue, outqueue):
