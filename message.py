@@ -120,7 +120,7 @@ proc = {UINT16:(uint16, uint16_store), UINT8:(uint8, uint8_store),
 	BIT8:(bit8, bit8_store)}
 
 class Data:
-	def __init__(self, opc, parser, offset, drange_raw, drange_show, label, pos=None, helpstr="No help available"):
+	def __init__(self, opc, parser, offset, drange_raw, drange_show, label, helpstr="No help available"):
 		self.opc = opc
 		self.parser = parser
 		self.offset = offset
@@ -129,7 +129,6 @@ class Data:
 		if drange_show:
 			assert len(drange_show) == len(drange_raw)
 		self.label = label
-		self.pos = pos
 		self.changed = False
 		self.helpstr = helpstr
 
@@ -167,6 +166,7 @@ class Data:
 			return raw
 		i = self.drange_raw.index(raw)
 		return self.drange_show[i]
+
 
 # Pot message
 ch1 = Data(OPC_POT, UINT16,  1, range(1000, 2001), None, "CH1")
@@ -245,11 +245,13 @@ mix1_dst       = Data(OPC_PARAM_DUMP, UINT4L, 50, range(6), ["CH1", "CH2", "CH3"
 mix1_upr       = Data(OPC_PARAM_DUMP, UINT8,  51, range(128), None, "Mix1 Uprate")
 mix1_dwr       = Data(OPC_PARAM_DUMP, UINT8,  52, range(128), None, "Mix1 Downrate")
 mix1_sw        = Data(OPC_PARAM_DUMP, UINT8,  53, range(4), ["SW A", "SW B", "On", "Off"], "Mix1 Switch")
+
 mix2_src       = Data(OPC_PARAM_DUMP, UINT4H, 54, range(8), ["CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "VRA", "VRB"], "Mix2 Source")
 mix2_dst       = Data(OPC_PARAM_DUMP, UINT4L, 54, range(6), ["CH1", "CH2", "CH3", "CH4", "CH5", "CH6"], "Mix2 Dest")
 mix2_upr       = Data(OPC_PARAM_DUMP, UINT8,  55, range(128), None, "Mix2 Uprate")
 mix2_dwr       = Data(OPC_PARAM_DUMP, UINT8,  56, range(128), None, "Mix2 Downrate")
 mix2_sw        = Data(OPC_PARAM_DUMP, UINT8,  57, range(4), ["SW A", "SW B", "On", "Off"], "Mix2 Switch")
+
 mix3_src       = Data(OPC_PARAM_DUMP, UINT4H, 58, range(8), ["CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "VRA", "VRB"], "Mix3 Source")
 mix3_dst       = Data(OPC_PARAM_DUMP, UINT4L, 58, range(6), ["CH1", "CH2", "CH3", "CH4", "CH5", "CH6"], "Mix3 Dest")
 mix3_upr       = Data(OPC_PARAM_DUMP, UINT8,  59, range(128), None, "Mix3 Uprate")
