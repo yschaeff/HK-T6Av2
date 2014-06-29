@@ -44,16 +44,16 @@ and parameter set.
   * Resp. Model1-4
 * Byte [0] lower nibble: Craft Type.
   *Resp. Acro, heli120, heli90, heli140
-* Byte [1]: Reverse. Bitmask.
-  * CH8 first, CH1 last. 0 off, 1 on.
+* Byte [1]: Reverse bitmask. Lower six bits
+  * CH1 last LSB. 0: off, 1: on.
 * Byte [2-7]: DR values [0-127]
-  * [2] CH1, DR off value
-  * [3] CH1, DR on value
-  * [4] CH2, DR off value
-  * [5] CH2, DR on value
-  * [6] CH4, DR off value
-  * [7] CH4, DR on value
-* Byte [8-10]: Swash AFR in percent
+  * [2] CH1, DR on value
+  * [3] CH1, DR off value
+  * [4] CH2, DR on value
+  * [5] CH2, DR off value
+  * [6] CH4, DR on value
+  * [7] CH4, DR off value
+* Byte [8-10]: Swash AFR [0-127]. Available in Heli modes only
   * [8] CH1
   * [9] CH2
   * [10] CH6
@@ -64,19 +64,19 @@ and parameter set.
   * [17] Left [18] Right CH4
   * [19] Left [20] Right CH5
   * [21] Left [22] Right CH6
-* Byte [23-32]: Throttle curve [0-127]
+* Byte [23-32]: Throttle curve [0-127]. Available in Heli modes only
   * [23] Normal [24] ID EP0
   * [25] Normal [26] ID EP1
   * [27] Normal [28] ID EP2
   * [29] Normal [30] ID EP3
   * [31] Normal [32] ID EP4
-* Byte [33-42]: Pitch curve [0-127]
+* Byte [33-42]: Pitch curve [0-127]. Available in Heli modes only
   * [33] Normal [34] ID EP0
   * [35] Normal [36] ID EP1
   * [37] Normal [38] ID EP2
   * [39] Normal [40] ID EP3
   * [41] Normal [42] ID EP4
-* Byte [43-48]: Subtrim, signed, two's complement
+* Byte [43-48]: Subtrim, signed, two's complement [-128-127]
   * [43] CH1
   * [44] CH2
   * [45] CH3
@@ -86,13 +86,13 @@ and parameter set.
 * Byte [49-52]: Mix1 setting
   * [49] upper nibble, source select, resp. CH1-CH6,VRA,VRB
   * [49] lower nibble, destination select, resp. CH1-CH6
-  * [50] Uprate in percent
-  * [51] Downrate in percent
+  * [50] Uprate [0-127]
+  * [51] Downrate [0-127]
   * [52] Switch, reps. SWA, SWB, ON, OFF
 * Byte [53-56]: Mix2 setting
 * Byte [57-60]: Mix3 setting
 * Byte [61-64]: Switch Functions
-  * [61] Switch A, Resp. NULL, DR, Thrcut, Nor/ID
-  * [62] Switch B, Resp. NULL, DR, Thrcut, Nor/ID
-  * [63] VRA, resp. NULL, Pith Adjust
-  * [64] VRB, resp. NULL, Pith Adjust
+  * [61] Switch A, Resp. Unassigned, Dual Rate, Throttle cut, Normal/Idle
+  * [62] Switch B, Resp. Unassigned, Dual Rate, Throttle cut, Normal/Idle
+  * [63] VRA, resp. Unassigned, Pitch Adjust. Available in Heli modes only
+  * [64] VRB, resp. Unassigned, Pitch Adjust. Available in Heli modes only
