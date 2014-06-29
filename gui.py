@@ -1,36 +1,41 @@
 from message import *
 import Queue, curses, sys, signal, os
 
+CP_LABEL  = 0
+CP_CHANGE = 1
+CP_SELECT = 2
+CP_FIELD  = 3
+
 def remap(minfm, maxfm, minto, maxto, v):
 	return (((v-minfm) * (maxto-minto)) / (maxfm-minfm)) + minto
 
 def draw_pot(win, offy, offx, msg, channels):
 	if not msg: return
-	for channel in channels:
-		win.addstr(channel.pos[0]+offy, offx, channel.label)
-		win.addstr(channel.pos[0]+offy, offx+len(channel.label)+1, str(channel.read(msg)))
+	for i, channel in enumerate(channels):
+		win.addstr(offy+i, offx, channel.label)
+		win.addstr(offy+i, offx+len(channel.label)+1, str(channel.read(msg)))
 		h,w = win.getmaxyx()
 		t,l = win.getbegyx()
 		l += 9 + offx
-		markl = remap(900, 2100, l, w, 1000)
-		markc = remap(900, 2100, l, w, 1500)
-		markr = remap(900, 2100, l, w, 2000)
-		markv = remap(900, 2100, l, w, channel.read(msg))
+		markl = remap(970, 2030, l, w, 1000)
+		markc = remap(970, 2030, l, w, 1500)
+		markr = remap(970, 2030, l, w, 2000)
+		markv = remap(970, 2030, l, w, channel.read(msg))
 		#we expect value between 1000 and 2000
 		c = " "
 		for x in range(l, w):
 			if x in [markl, markc, markr]: #markers
 				if x == markv:
-					style = curses.color_pair(3)|curses.A_BOLD
+					style = CP_FIELD
 				else:
-					style = curses.color_pair(1)|curses.A_BOLD
-				win.addstr(channel.pos[0]+offy, x, c, style)
+					style = CP_CHANGE
+				win.addstr(offy+i, x, c, curses.color_pair(style))
 			else:
 				if x == markv:
-					style = curses.color_pair(3)|curses.A_BOLD
+					style = CP_FIELD
 				else:
-					style = curses.color_pair(2)|curses.A_BOLD
-				win.addstr(channel.pos[0]+offy, x, c, style)
+					style = CP_SELECT
+				win.addstr(offy+i, x, c, curses.color_pair(style))
 
 def autotrim(param_msg, pot_msg, trims, channels):
 	"""Trims and channels need to be sorted the same"""
@@ -42,34 +47,79 @@ def autotrim(param_msg, pot_msg, trims, channels):
 		if v > 127: v = 127
 		tr.write(param_msg, v)
 
+def draw_column(win, y, x, msg, selected, title, fields, form):
+	
+	win.addstr(y, x, title, curses.color_pair(CP_LABEL)|curses.A_BOLD)
+	for i, d in enumerate(fields):
+		if d == selected:
+			style = curses.color_pair(CP_SELECT)|curses.A_BOLD
+		elif d.changed:
+			style = curses.color_pair(CP_CHANGE)|curses.A_BOLD
+		else:
+			style = curses.color_pair(CP_FIELD)|curses.A_BOLD
+		v = d.get(msg)
+		win.addstr(y+i+1, x, form%v, style)
+
 
 def draw_param(win, offy, offx, msg, selected, datas):
 	if not msg: return
 
-	for i, data in enumerate(datas):
-		v = data.get(msg)
-		if i == selected:
-			style = curses.color_pair(2)
-			form = "%s: <%s>"
-		else:
-			if data.changed:
-				style = curses.color_pair(1)
-			else:
-				style = curses.color_pair(3)
-			form = "%s:  %s"
-		y = offy + data.pos[0]
-		x = offx + data.pos[1]
-		win.addstr(y, x, form%(data.label, v), style)
+	#channels
+	for i in range(6):
+		win.addstr(offy+i+1, offx+0, "CH%d:"%(i+1), curses.color_pair(0)|curses.A_BOLD)
+	draw_column(win, offy, offx+5,  msg, selected, "Left", endleft, "%4s")
+	draw_column(win, offy, offx+10, msg, selected, "Trim", trims, "%4s")
+	draw_column(win, offy, offx+15, msg, selected, "Rght", endright, "%4s")
+	draw_column(win, offy, offx+20, msg, selected, "Rvrs", reverse, "%4s")
+
+	#Curves
+	win.addstr(offy, offx+30, "Throttle      Pitch", curses.color_pair(0)|curses.A_BOLD)
+	for i in range(5):
+		win.addstr(offy+i+2, offx+26, "P%d:"%(i), curses.color_pair(0)|curses.A_BOLD)
+	draw_column(win, offy+1, offx+30, msg, selected, "Norm", thr_curve_norm, "%4s")
+	draw_column(win, offy+1, offx+35, msg, selected, "Idle", thr_curve_idle, "%4s")
+	draw_column(win, offy+1, offx+40, msg, selected, "Norm", ptch_curve_norm, "%4s")
+	draw_column(win, offy+1, offx+45, msg, selected, "Idle", ptch_curve_idle, "%4s")
+
+	#Mixing
+	win.addstr(offy, offx+57, "Channel Mixing", curses.color_pair(0)|curses.A_BOLD)
+	for i,ii in enumerate(["Srce", "Dest", "Uprt", "Dwrt", "Swch"]):
+		win.addstr(offy+i+2, offx+51, ii+":", curses.color_pair(0)|curses.A_BOLD)
+	draw_column(win, offy+1, offx+57, msg, selected, "Mix1", mix1, "%4s")
+	draw_column(win, offy+1, offx+62, msg, selected, "Mix2", mix2, "%4s")
+	draw_column(win, offy+1, offx+67, msg, selected, "Mix3", mix3, "%4s")
+
+	#dual rate
+	win.addstr(offy+8, offx+5, "Dual Rate", curses.color_pair(0)|curses.A_BOLD)
+	for i, ii in enumerate([1,2,4]):
+		win.addstr(offy+i+10, offx+0, "CH%d:"%(ii), curses.color_pair(0)|curses.A_BOLD)
+	draw_column(win, offy+9, offx+5, msg, selected, "Off", dr_off, "%4s")
+	draw_column(win, offy+9, offx+10, msg, selected, "On", dr_on, "%4s")
+
+	#Swash AFR
+	for i, ii in enumerate([1,2,6]):
+		win.addstr(offy+i+10, offx+16, "CH%d:"%(ii), curses.color_pair(0)|curses.A_BOLD)
+	draw_column(win, offy+9, offx+21, msg, selected, "Swsh", swash, "%4s")
+
+	#switch functions
+	for i, ii in enumerate(["SWA", "SWB", "VRA", "VRB"]):
+		win.addstr(offy+i+9, offx+27, "%s:"%ii, curses.color_pair(0)|curses.A_BOLD)
+	draw_column(win, offy+8, offx+32, msg, selected, "Functiom", [swa, swb, vra, vrb], "%9s")
+
+	#mode,type
+	for i, ii in enumerate(["TX", "Craft"]):
+		win.addstr(offy+i+11, offx+43, "%5s:"%ii, curses.color_pair(0)|curses.A_BOLD)
+	draw_column(win, offy+10, offx+50, msg, selected, "Mode", [tx_mode, craft_type], "%7s")
 
 def draw_legenda(win, offy, offx):
-	win.addstr(offy+0, offx, "d: download configuration to PC",
-		curses.color_pair(3)|curses.A_BOLD)
-	win.addstr(offy+1, offx, "u: upload configuration to TX",
-		curses.color_pair(3)|curses.A_BOLD)
-	win.addstr(offy+2, offx, "a: Auto trim, keep sticks centered",
-		curses.color_pair(3)|curses.A_BOLD)
-	win.addstr(offy+3, offx, "q: quit",
-		curses.color_pair(3)|curses.A_BOLD)
+	win.addstr(offy+0, offx, "d: download, u: upload, a: auto-trim, q: quit",
+		curses.color_pair(0)|curses.A_BOLD)
+
+def draw_help(win, offy, offx, index, datas):
+	win.addstr(offy+0, offx, datas[index].label + ": " + datas[index].helpstr,
+		curses.color_pair(0))
+	win.clrtoeol()
+	
 
 def gui(stdscr, inqueue, outqueue):
 	#init
@@ -78,19 +128,21 @@ def gui(stdscr, inqueue, outqueue):
 	curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_BLUE)
 
 	index = 0
-
 	last_pot_msg = None
 	last_param_msg = None
+	repaint = True
 
 	stdscr.nodelay(1)
+	#TODO on resize, refresh
 	outqueue.put(request_param_msg())
 	while True:
-		stdscr.clear()
 		draw_legenda(stdscr, 0, 0)
-		draw_pot(stdscr, 4, 0, last_pot_msg, channels)
-		draw_param(stdscr, 12, 0, last_param_msg, index, datas)
+		draw_param(stdscr, 10, 0, last_param_msg, datas[index], datas)
+		draw_help(stdscr, 1, 0, index, datas)
+		draw_pot(stdscr, 3, 0, last_pot_msg, channels)
+		repaint = False
 		stdscr.refresh()
-		#user input
+		
 		c = stdscr.getch()
 		if c != curses.ERR:
 			if c == ord('q'):
@@ -113,6 +165,7 @@ def gui(stdscr, inqueue, outqueue):
 				datas[index].inc(last_param_msg)
 				datas[index].changed = True
 
+		#user input
 		try:
 			m = inqueue.get(timeout=0.05)
 		except Queue.Empty:
@@ -125,7 +178,6 @@ def gui(stdscr, inqueue, outqueue):
 			last_param_msg = m
 			for d in datas:
 				d.changed = False
-
 
 def gui_loop(inqueue, outqueue):
 	curses.wrapper(gui, inqueue, outqueue)
