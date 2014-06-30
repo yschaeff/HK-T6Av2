@@ -26,7 +26,17 @@ Usage:
 ```
 With the -d and -u options you can backup/restore tranmitter settings.
 Without those arguments the program will launch a GUI. (I expect
-backup/restore to work on MS Windows as well.)
+backup/restore to work on MS Windows as well.) Requirements: python,
+python-serial.
+
+The software might work for:
+* HobbyKing HK-T6A (tested by me)
+* FlySky FS-CT6A, FS-CT6B
+* Turborix TBXT6
+* Exceed RC (tested by copterrichie)
+* Storm ST-06TX
+* CopterX CX-CT6A, CX-CT6B
+* Jamara FCX 6
 
 # HK-T6Av2 Protocol
 The serial port of the transmitter is set at 115200 baud. I've seen 4
