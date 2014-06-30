@@ -283,7 +283,3 @@ dr_on           = [ch1_dr_on,  ch2_dr_on, ch4_dr_on]
 swash           = [ch1_swash, ch2_swash, ch6_swash]
 switches        = [swa, swb, vra, vrb]
 mode            = [tx_mode, craft_type]
-
-datas = endleft + trims + endright + reverse + thr_curve_norm + \
-	thr_curve_idle + ptch_curve_norm + ptch_curve_idle + mix1 + \
-	mix2 + mix3 + dr_off + dr_on + swash + switches + mode

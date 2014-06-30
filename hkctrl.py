@@ -2,9 +2,6 @@
 
 from message import *
 
-g_spurious = 0
-g_cksm_err = 0
-
 def send_msg(msg, serialdev):
 	serialdev.write(chr(MSGSTART))
 	for c in msg:
@@ -12,8 +9,6 @@ def send_msg(msg, serialdev):
 
 def read_msg(serialdev):
 	import select
-	global g_spurious
-	global g_cksm_err
 
 	msglen = 0
 	msg = None
@@ -30,17 +25,14 @@ def read_msg(serialdev):
 				s = 2
 				msg = [c] + [0]*(MSGMAP[c]-1)
 				msglen = 1
-			else:
+			else: #we are not in sync, reset
 				s = 0
-				g_spurious += 1
 		else:
 			msg[msglen] = c
 			msglen += 1
 			if msglen >= MSGMAP[msg[0]]:
 				if checksum(msg):
 					return msg
-				g_cksm_err += 1
-				print "checksum error"
 				s = 0
 
 def handle_commandline():
@@ -118,7 +110,6 @@ if __name__ == '__main__':
 					break
 			if interactive and not inqueue.empty():
 				item = inqueue.get(block=False, timeout=0) #todo try/except
-				#~ print "gui: %s"%str(map(ord, item))
 				send_msg(item, serialdev)
 
 	except KeyboardInterrupt:

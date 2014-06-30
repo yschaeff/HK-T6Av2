@@ -2,9 +2,6 @@
 
 from message import *
 
-g_spurious = 0
-g_cksm_err = 0
-
 def send_msg(msg, serialdev):
 	for c in msg:
 		serialdev.write(c)
