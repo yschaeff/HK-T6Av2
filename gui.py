@@ -176,8 +176,8 @@ def gui(stdscr, inqueue, outqueue):
 			elif c == curses.KEY_UP:
 				index = (index-1)%len(settings)
 			elif c == curses.KEY_LEFT:
-				setting[index].dec(last_param_msg)
-				setting[index].changed = True
+				settings[index].dec(last_param_msg)
+				settings[index].changed = True
 			elif c == curses.KEY_RIGHT:
 				settings[index].inc(last_param_msg)
 				settings[index].changed = True
