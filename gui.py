@@ -127,7 +127,7 @@ def draw_param(win, offy, offx, msg, selected, datas):
 
 def draw_legenda(win, offy, offx):
 	addstr(win, offy, offx,
-		"d: download, u: upload, a: auto-trim, q: quit, arrow keys",
+		"d: download, u: upload, a: auto-trim, q: quit, arrow keys, tab",
 		curses.color_pair(0)|curses.A_BOLD)
 
 def draw_help(win, offy, offx, index, datas):
@@ -150,6 +150,10 @@ def gui(stdscr, inqueue, outqueue):
 	settings = endleft + trims + endright + reverse + thr_curve_norm + \
 		thr_curve_idle + ptch_curve_norm + ptch_curve_idle + mix1 + \
 		mix2 + mix3 + dr_off + dr_on + swash + switches + mode
+	tabstops = [ch1_end_left, ch1_subtrim, ch1_end_right, ch1_reverse,
+		thrcrv_norm_0, thrcrv_idle_0, ptchcrv_norm_0, ptchcrv_idle_0,
+		mix1_src, mix2_src, mix3_src, ch1_dr_on, ch1_dr_off, ch1_swash,
+		swa, tx_mode]
 
 	index = 0 #index of selected field
 	last_pot_msg = None
@@ -195,6 +199,18 @@ def gui(stdscr, inqueue, outqueue):
 			elif c == curses.KEY_RIGHT:
 				settings[index].inc(last_param_msg)
 				settings[index].changed = True
+			elif c == ord('\t'):
+				index = (index+1)%len(settings)
+				cur = settings[index]
+				while cur not in tabstops:
+					index = (index+1)%len(settings)
+					cur = settings[index]
+			elif c == curses.KEY_BTAB:
+				index = (index-1)%len(settings)
+				cur = settings[index]
+				while cur not in tabstops:
+					index = (index-1)%len(settings)
+					cur = settings[index]
 
 		# Handle incoming message, short timeout to keep gui responsive.
 		# Especially with radio switched off.
