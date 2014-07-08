@@ -14,8 +14,8 @@ def remap(minfm, maxfm, minto, maxto, v):
 def draw_pot(win, offy, offx, msg, channels):
 	"""Draw positions of the potmeters"""
 	for i, channel in enumerate(channels):
-		win.addstr(offy+i, offx, channel.label)
-		win.addstr(offy+i, offx+len(channel.label)+1,
+		addstr(win, offy+i, offx, channel.label)
+		addstr(win, offy+i, offx+len(channel.label)+1,
 			str(channel.read(msg)))
 		h,w = win.getmaxyx()
 		t,l = win.getbegyx()
@@ -32,13 +32,13 @@ def draw_pot(win, offy, offx, msg, channels):
 					style = CP_FIELD
 				else:
 					style = CP_CHANGE
-				win.addstr(offy+i, x, " ", curses.color_pair(style))
+				addstr(win, offy+i, x, " ", curses.color_pair(style))
 			else:
 				if x == markv:
 					style = CP_FIELD
 				else:
 					style = CP_SELECT
-				win.addstr(offy+i, x, " ", curses.color_pair(style))
+				addstr(win, offy+i, x, " ", curses.color_pair(style))
 
 def autotrim(param_msg, pot_msg, trims, channels, reverse):
 	"""Trims and channels need to be sorted the same"""
@@ -50,10 +50,22 @@ def autotrim(param_msg, pot_msg, trims, channels, reverse):
 		tr.write(param_msg, min(max(v, -128), 127))
 		tr.changed = True
 
+def addstr(win, y, x, text, style=None, wrapping_ok=False):
+	"""Wrapper to make addstr safe"""
+	h,w = win.getmaxyx()
+	if x>=w or y>=h-1: return # -1 because of the trailing newline...
+	if not wrapping_ok:
+		text = text[:w - x] #prevent wrapping
+	if len(text)/w >= (h-1): return
+	if (style):
+		win.addstr(y%h, x%w, text, style)
+	else:
+		win.addstr(y%h, x%w, text)
+
 def draw_column(win, y, x, msg, selected, title, fields, form):
 	"""Draw a column of similar data. Handle caption, selected
 		fields and changed data"""
-	win.addstr(y, x, title, curses.color_pair(CP_LABEL)|curses.A_BOLD)
+	addstr(win, y, x, title, curses.color_pair(CP_LABEL)|curses.A_BOLD)
 	for i, d in enumerate(fields):
 		if d == selected:
 			style = curses.color_pair(CP_SELECT)|curses.A_BOLD
@@ -61,69 +73,71 @@ def draw_column(win, y, x, msg, selected, title, fields, form):
 			style = curses.color_pair(CP_CHANGE)|curses.A_BOLD
 		else:
 			style = curses.color_pair(CP_FIELD)|curses.A_BOLD
-		win.addstr(y+i+1, x, form%d.get(msg), style)
+		addstr(win, y+i+1, x, form%d.get(msg), style)
 
 
 def draw_param(win, offy, offx, msg, selected, datas):
 	style = curses.color_pair(CP_LABEL)|curses.A_BOLD
 	#channels
 	for i in range(6):
-		win.addstr(offy+i+1, offx+0, "CH%d:"%(i+1), style)
+		addstr(win, offy+i+1, offx+0, "CH%d:"%(i+1), style)
 	draw_column(win, offy, offx+5,  msg, selected, "Left", endleft, "%4s")
 	draw_column(win, offy, offx+10, msg, selected, "Trim", trims, "%4s")
 	draw_column(win, offy, offx+15, msg, selected, "Rght", endright, "%4s")
 	draw_column(win, offy, offx+20, msg, selected, "Rvrs", reverse, "%4s")
 
 	#Curves
-	win.addstr(offy, offx+30, "Throttle      Pitch", style)
+	addstr(win, offy, offx+30, "Throttle      Pitch", style)
 	for i in range(5):
-		win.addstr(offy+i+2, offx+26, "P%d:"%(i), style)
+		addstr(win, offy+i+2, offx+26, "P%d:"%(i), style)
 	draw_column(win, offy+1, offx+30, msg, selected, "Norm", thr_curve_norm, "%4s")
 	draw_column(win, offy+1, offx+35, msg, selected, "Idle", thr_curve_idle, "%4s")
 	draw_column(win, offy+1, offx+40, msg, selected, "Norm", ptch_curve_norm, "%4s")
 	draw_column(win, offy+1, offx+45, msg, selected, "Idle", ptch_curve_idle, "%4s")
 
 	#Mixing
-	win.addstr(offy, offx+57, "Channel Mixing", style)
+	addstr(win, offy, offx+57, "Channel Mixing", style)
 	for i,ii in enumerate(["Srce", "Dest", "Uprt", "Dwrt", "Swch"]):
-		win.addstr(offy+i+2, offx+51, ii+":", style)
+		addstr(win, offy+i+2, offx+51, ii+":", style)
 	draw_column(win, offy+1, offx+57, msg, selected, "Mix1", mix1, "%4s")
 	draw_column(win, offy+1, offx+62, msg, selected, "Mix2", mix2, "%4s")
 	draw_column(win, offy+1, offx+67, msg, selected, "Mix3", mix3, "%4s")
 
 	#dual rate
-	win.addstr(offy+8, offx+5, "Dual Rate", style)
+	addstr(win, offy+8, offx+5, "Dual Rate", style)
 	for i, ii in enumerate([1,2,4]):
-		win.addstr(offy+i+10, offx+0, "CH%d:"%(ii), style)
+		addstr(win, offy+i+10, offx+0, "CH%d:"%(ii), style)
 	draw_column(win, offy+9, offx+5, msg, selected, "Off", dr_off, "%4s")
 	draw_column(win, offy+9, offx+10, msg, selected, "On", dr_on, "%4s")
 
 	#Swash AFR
 	for i, ii in enumerate([1,2,6]):
-		win.addstr(offy+i+10, offx+16, "CH%d:"%(ii), style)
+		addstr(win, offy+i+10, offx+16, "CH%d:"%(ii), style)
 	draw_column(win, offy+9, offx+21, msg, selected, "Swsh", swash, "%4s")
 
 	#switch functions
 	for i, ii in enumerate(["SWA", "SWB", "VRA", "VRB"]):
-		win.addstr(offy+i+9, offx+27, "%s:"%ii, style)
+		addstr(win, offy+i+9, offx+27, "%s:"%ii, style)
 	draw_column(win, offy+8, offx+32, msg, selected, "Functiom", [swa, swb, vra, vrb], "%9s")
 
 	#mode,type
 	for i, ii in enumerate(["TX", "Craft"]):
-		win.addstr(offy+i+11, offx+43, "%5s:"%ii, style)
+		addstr(win, offy+i+11, offx+43, "%5s:"%ii, style)
 	draw_column(win, offy+10, offx+50, msg, selected, "Mode", [tx_mode, craft_type], "%7s")
 
 def draw_legenda(win, offy, offx):
-	win.addstr(offy, offx,
+	addstr(win, offy, offx,
 		"d: download, u: upload, a: auto-trim, q: quit, arrow keys",
 		curses.color_pair(0)|curses.A_BOLD)
 
 def draw_help(win, offy, offx, index, datas):
+	h,w = win.getmaxyx()
+	if offy+1 >= h: return
 	win.move(offy,   offx); win.clrtoeol()
 	win.move(offy+1, offx); win.clrtoeol()
-	win.addstr(offy+0, offx,
+	addstr(win, offy+0, offx,
 		datas[index].label + ": " + datas[index].helpstr,
-		curses.color_pair(0))
+		curses.color_pair(0), wrapping_ok=True)
 	
 
 def gui(stdscr, inqueue, outqueue):
