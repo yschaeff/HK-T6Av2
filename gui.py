@@ -54,9 +54,9 @@ def addstr(win, y, x, text, style=None, wrapping_ok=False):
 	"""Wrapper to make addstr safe"""
 	h,w = win.getmaxyx()
 	if x>=w or y>=h-1: return # -1 because of the trailing newline...
-	if not wrapping_ok:
-		text = text[:w - x] #prevent wrapping
-	if len(text)/w >= (h-1): return
+	if not wrapping_ok and x+len(text)>w:
+		text = text[:w - x - 1]+">" #prevent wrapping
+	if len(text)/w >= h-y-1: return
 	if (style):
 		win.addstr(y%h, x%w, text, style)
 	else:
