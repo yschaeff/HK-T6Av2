@@ -1,6 +1,6 @@
 HK-T6Av2
 ========
-Serial protocol desciption between computer and HK-T6Av2 RC remote
+Serial protocol description between computer and HK-T6Av2 RC remote
 
 In this directory you will find a program to configure your Hobby King
 remote control from Linux. Further down in this document the full
@@ -24,7 +24,7 @@ Usage:
                          Dump config from transmitter and exit. Make sure
                          transmitter is switched on prior to running program.
 ```
-With the -d and -u options you can backup/restore tranmitter settings.
+With the -d and -u options you can backup/restore transmitter settings.
 Without those arguments the program will launch a GUI. (I expect
 backup/restore to work on MS Windows as well.) Requirements: python,
 python-serial.
@@ -78,7 +78,7 @@ and parameter set.
 * Byte [0] upper nibble: TX Model.
   * Resp. Model1-4
 * Byte [0] lower nibble: Craft Type.
-  *Resp. Acro, heli120, heli90, heli140
+  * Resp. Acro, heli120, heli90, heli140
 * Byte [1]: Reverse bitmask. Lower six bits
   * CH1 last LSB. 0: off, 1: on.
 * Byte [2-7]: DR values [0-127]
