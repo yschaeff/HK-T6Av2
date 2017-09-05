@@ -242,20 +242,20 @@ ch6_subtrim    = Data(OPC_PARAM_DUMP, SINT8, 49, range(-128, 128), None, "CH6 su
 
 mix1_src       = Data(OPC_PARAM_DUMP, UINT4H, 50, range(8), ["CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "VRA", "VRB"], "Mix1 Source", "Input potmeter for mixing")
 mix1_dst       = Data(OPC_PARAM_DUMP, UINT4L, 50, range(6), ["CH1", "CH2", "CH3", "CH4", "CH5", "CH6"], "Mix1 Dest", "Channel being influenced by source")
-mix1_upr       = Data(OPC_PARAM_DUMP, UINT8,  51, range(-128, 128), None, "Mix1 Uprate", "Weight of source to output of mixing, right/above center stick")
-mix1_dwr       = Data(OPC_PARAM_DUMP, UINT8,  52, range(-128, 128), None, "Mix1 Downrate", "Weight of source to output of mixing, left/below center stick")
+mix1_upr       = Data(OPC_PARAM_DUMP, SINT8,  51, range(-128, 128), None, "Mix1 Uprate", "Weight of source to output of mixing, right/above center stick")
+mix1_dwr       = Data(OPC_PARAM_DUMP, SINT8,  52, range(-128, 128), None, "Mix1 Downrate", "Weight of source to output of mixing, left/below center stick")
 mix1_sw        = Data(OPC_PARAM_DUMP, UINT8,  53, range(4), ["SW A", "SW B", "On", "Off"], "Mix1 Enable", "How to enable this mix setting")
 
 mix2_src       = Data(OPC_PARAM_DUMP, UINT4H, 54, range(8), ["CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "VRA", "VRB"], "Mix2 Source", "Input potmeter for mixing")
 mix2_dst       = Data(OPC_PARAM_DUMP, UINT4L, 54, range(6), ["CH1", "CH2", "CH3", "CH4", "CH5", "CH6"], "Mix2 Dest", "Channel being influenced by source")
-mix2_upr       = Data(OPC_PARAM_DUMP, UINT8,  55, range(-128, 128), None, "Mix2 Uprate", "Weight of source to output of mixing, left/below center stick")
-mix2_dwr       = Data(OPC_PARAM_DUMP, UINT8,  56, range(-128, 128), None, "Mix2 Downrate", "Weight of source to output of mixing, left/below center stick")
+mix2_upr       = Data(OPC_PARAM_DUMP, SINT8,  55, range(-128, 128), None, "Mix2 Uprate", "Weight of source to output of mixing, left/below center stick")
+mix2_dwr       = Data(OPC_PARAM_DUMP, SINT8,  56, range(-128, 128), None, "Mix2 Downrate", "Weight of source to output of mixing, left/below center stick")
 mix2_sw        = Data(OPC_PARAM_DUMP, UINT8,  57, range(4), ["SW A", "SW B", "On", "Off"], "Mix2 Enable", "How to enable this mix setting")
 
 mix3_src       = Data(OPC_PARAM_DUMP, UINT4H, 58, range(8), ["CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "VRA", "VRB"], "Mix3 Source", "Input potmeter for mixing")
 mix3_dst       = Data(OPC_PARAM_DUMP, UINT4L, 58, range(6), ["CH1", "CH2", "CH3", "CH4", "CH5", "CH6"], "Mix3 Dest", "Channel being influenced by source")
-mix3_upr       = Data(OPC_PARAM_DUMP, UINT8,  59, range(-128, 128), None, "Mix3 Uprate", "Weight of source to output of mixing, left/below center stick")
-mix3_dwr       = Data(OPC_PARAM_DUMP, UINT8,  60, range(-128, 128), None, "Mix3 Downrate", "Weight of source to output of mixing, left/below center stick")
+mix3_upr       = Data(OPC_PARAM_DUMP, SINT8,  59, range(-128, 128), None, "Mix3 Uprate", "Weight of source to output of mixing, left/below center stick")
+mix3_dwr       = Data(OPC_PARAM_DUMP, SINT8,  60, range(-128, 128), None, "Mix3 Downrate", "Weight of source to output of mixing, left/below center stick")
 mix3_sw        = Data(OPC_PARAM_DUMP, UINT8,  61, range(4), ["SW A", "SW B", "On", "Off"], "Mix3 Enable", "How to enable this mix setting")
 
 swa            = Data(OPC_PARAM_DUMP, UINT8,  62, range(4), ["None", "Dual Rate", "Throt.cut", "Norm/Idle"], "Switch A", "Function for switch")
