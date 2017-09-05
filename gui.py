@@ -127,7 +127,7 @@ def draw_param(win, offy, offx, msg, selected, datas):
 
 def draw_legenda(win, offy, offx):
 	addstr(win, offy, offx,
-		"d: download, u: upload, a: auto-trim, q: quit, arrow keys, tab",
+		"d: download, u: upload, a: auto-trim, q: quit, arrow keys (hjkl), tab, +, -, space",
 		curses.color_pair(0)|curses.A_BOLD)
 
 def draw_help(win, offy, offx, index, datas):
@@ -138,7 +138,34 @@ def draw_help(win, offy, offx, index, datas):
 	addstr(win, offy+0, offx,
 		datas[index].label + ": " + datas[index].helpstr,
 		curses.color_pair(0), wrapping_ok=True)
-	
+
+def prev_column(settings, index, tabstops):
+	## find out position
+	idxs = [settings.index(t) for t in tabstops]
+	right = index % len(settings)
+	while right not in idxs:
+		right -= 1
+	offset = index - right
+	left = (right - 1) % len(settings)
+	while left not in idxs:
+		left = (left - 1) % len(settings)
+	target = (left + offset) % len(settings)
+	if target >= right:
+	    target = right - 1
+	return target
+
+def next_column(settings, index, tabstops):
+	## find out position
+	idxs = [settings.index(t) for t in tabstops]
+	left = index % len(settings)
+	while left not in idxs:
+		left -= 1
+	offset = index - left
+	right = (index + 1) % len(settings)
+	while right not in idxs:
+		right = (right + 1) % len(settings)
+	target = (right + offset) % len(settings)
+	return target
 
 def gui(stdscr, inqueue, outqueue):
 	#define colors
@@ -189,16 +216,27 @@ def gui(stdscr, inqueue, outqueue):
 			elif c == ord('a') and last_param_msg and last_pot_msg:
 				autotrim(last_param_msg, last_pot_msg, trims, channels,
 					reverse)
-			elif c == curses.KEY_DOWN:
+
+			## vi style navigation
+			elif c == ord('j') or c == curses.KEY_DOWN:
 				index = (index+1)%len(settings)
-			elif c == curses.KEY_UP:
+			elif c == ord('k') or c == curses.KEY_UP:
 				index = (index-1)%len(settings)
-			elif c == curses.KEY_LEFT:
-				settings[index].dec(last_param_msg)
+			elif c == ord('l') or c == curses.KEY_RIGHT:
+				index = next_column(settings, index, tabstops)
+			elif c == ord('h') or c == curses.KEY_LEFT:
+				index = prev_column(settings, index, tabstops)
+
+			elif c == ord(' '):
+				settings[index].inc_wrap(last_param_msg)
 				settings[index].changed = True
-			elif c == curses.KEY_RIGHT:
+			elif c == ord('+') or c == ord(' ') or c == ord('='):
 				settings[index].inc(last_param_msg)
 				settings[index].changed = True
+			elif c == ord('-'):
+				settings[index].dec(last_param_msg)
+				settings[index].changed = True
+
 			elif c == ord('\t'):
 				index = (index+1)%len(settings)
 				cur = settings[index]

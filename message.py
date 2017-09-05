@@ -159,6 +159,19 @@ class Data:
 		if i == len(self.drange_raw)-1: return
 		self.write(msg, self.drange_raw[i+1])
 
+	def inc_wrap(self, msg):
+		if not msg: return
+		raw = self.read(msg)
+		if not raw in self.drange_raw:
+			self.write(msg, self.drange_raw[0])
+			return
+		i = self.drange_raw.index(raw)
+		if i == len(self.drange_raw)-1:
+			self.write(msg, self.drange_raw[0])
+		else:
+			self.write(msg, self.drange_raw[i+1])
+
+
 	def get(self, msg):
 		"""Return current value in presentation format"""
 		raw = self.read(msg)
