@@ -38,6 +38,8 @@ The software might work for:
 * CopterX CX-CT6A, CX-CT6B
 * Jamara FCX 6
 
+![Logo](https://github.com/yschaeff/HK-T6Av2/raw/master/screenshot0.jpg)
+
 # HK-T6Av2 Protocol
 The serial port of the transmitter is set at 115200 baud. I've seen 4
 messages so far. Pot-state message, parameter request, parameter dump,
