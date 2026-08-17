@@ -11,7 +11,7 @@ def read_test_msg():
 	v = int(math.sin(time.time())*500 + 1500)
 	w = int(math.sin(time.time()+1)*500 + 1500)
 	time.sleep(0.01)
-	return map(ord, pot_msg(1500, v, w, 1500, 1500, 1500))
+	return list(map(ord, pot_msg(1500, v, w, 1500, 1500, 1500)))
 
 def handle_commandline():
 	import argparse
@@ -32,7 +32,7 @@ def handle_commandline():
 		" transmitter is switched on prior to running program.")
 	return parser.parse_args()
 
-import serial, sys, pickle, threading, Queue, signal
+import serial, sys, pickle, threading, queue, signal
 from gui import gui_loop
 
 if __name__ == '__main__':
@@ -55,17 +55,17 @@ if __name__ == '__main__':
 			load_file.close()
 			#~ send_msg(load_param_msg(payload), serialdev)
 	except serial.serialutil.SerialException as e:
-		print "Error opening serial port:\n\t%s"%str(e)
+		print("Error opening serial port:\n\t%s"%str(e))
 		sys.exit(1)
 	except (IOError, KeyError, EOFError) as e:
-		print "Error opening file:\n\t%s"%str(e)
+		print("Error opening file:\n\t%s"%str(e))
 		#~ serialdev.close()
 		sys.exit(1)
 
 	interactive = not args.download and not args.upload
 	if interactive:
-		outqueue = Queue.Queue()
-		inqueue  = Queue.Queue()
+		outqueue = queue.Queue()
+		inqueue  = queue.Queue()
 		gui_thread = threading.Thread(target=gui_loop,
 			args=[outqueue, inqueue])
 		gui_thread.start()
@@ -79,8 +79,8 @@ if __name__ == '__main__':
 				break
 			elif msg[0] == OPC_PARAM_DUMP and args.upload:
 				if msg[1:-2] != payload:
-					print "Uploading failed. Written settings differ"\
-						" from what is read back."
+					print("Uploading failed. Written settings differ"\
+						" from what is read back.")
 					error = 1
 				break
 			if interactive:
@@ -89,18 +89,18 @@ if __name__ == '__main__':
 					break
 			if interactive and not inqueue.empty():
 				item = inqueue.get(block=False, timeout=0) #todo try/except
-				item = map(ord, item)
+				item = list(map(ord, item))
 				#~ send_msg(item, serialdev)
 				if item[0] == OPC_PARAM_LOAD:
 					item[0] = OPC_PARAM_DUMP
 					outqueue.put(item)
 				elif item[0] == OPC_PARAM_REQUEST:
-					outqueue.put(map(ord, dump_param_msg([0]*(MSGMAP[OPC_PARAM_DUMP]-3))))
+					outqueue.put(list(map(ord, dump_param_msg([0]*(MSGMAP[OPC_PARAM_DUMP]-3)))))
 
 	except KeyboardInterrupt:
 		pass
 	except serial.serialutil.SerialException:
-		print "error reading from serial port"
+		print("error reading from serial port")
 	if interactive:
 		outqueue.put(None)
 		gui_thread.join()

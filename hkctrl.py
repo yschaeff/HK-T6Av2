@@ -3,9 +3,7 @@
 from message import *
 
 def send_msg(msg, serialdev):
-	serialdev.write(chr(MSGSTART))
-	for c in msg:
-		serialdev.write(c)
+    serialdev.write(bytes([MSGSTART]) + bytes(msg))
 
 def read_msg(serialdev):
 	import select
@@ -54,7 +52,7 @@ def handle_commandline():
 		" transmitter is switched on prior to running program.")
 	return parser.parse_args()
 
-import serial, sys, pickle, threading, Queue, signal
+import serial, sys, pickle, threading, queue, signal
 from gui import gui_loop
 
 if __name__ == '__main__':
@@ -69,25 +67,25 @@ if __name__ == '__main__':
 			stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
 
 		if args.download:
-			dump_file = open(args.download, "w")
+			dump_file = open(args.download, "wb")
 			send_msg(request_param_msg(), serialdev)
 		elif args.upload:
-			load_file = open(args.upload, "r")
+			load_file = open(args.upload, "rb")
 			payload = pickle.load(load_file)
 			load_file.close()
 			send_msg(load_param_msg(payload), serialdev)
 	except serial.serialutil.SerialException as e:
-		print "Error opening serial port:\n\t%s"%str(e)
+		print(("Error opening serial port:\n\t%s"%str(e)))
 		sys.exit(1)
 	except IOError as e:
-		print "Error opening file:\n\t%s"%str(e)
+		print(("Error opening file:\n\t%s"%str(e)))
 		serialdev.close()
 		sys.exit(1)
 
 	interactive = not args.download and not args.upload
 	if interactive:
-		outqueue = Queue.Queue()
-		inqueue  = Queue.Queue()
+		outqueue = queue.Queue()
+		inqueue  = queue.Queue()
 		gui_thread = threading.Thread(target=gui_loop,
 			args=[outqueue, inqueue])
 		gui_thread.start()
@@ -100,8 +98,8 @@ if __name__ == '__main__':
 				break
 			elif msg[0] == OPC_PARAM_DUMP and args.upload:
 				if msg[1:-2] != payload:
-					print "Uploading failed. Written settings differ"\
-						" from what is read back."
+					print("Uploading failed. Written settings differ"\
+						" from what is read back.")
 					error = 1
 				break
 			if interactive:
@@ -115,7 +113,7 @@ if __name__ == '__main__':
 	except KeyboardInterrupt:
 		pass
 	except serial.serialutil.SerialException:
-		print "error reading from serial port"
+		print("error reading from serial port")
 	if interactive:
 		outqueue.put(None)
 		gui_thread.join()

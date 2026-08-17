@@ -1,5 +1,5 @@
 from message import *
-import Queue, curses, signal, os
+import queue, curses, signal, os
 
 # Cursus Color Pairs
 CP_LABEL  = 0
@@ -254,7 +254,7 @@ def gui(stdscr, inqueue, outqueue):
 		# Especially with radio switched off.
 		try:
 			m = inqueue.get(timeout=0.05)
-		except Queue.Empty:
+		except queue.Empty:
 			continue
 		if not m:
 			break
